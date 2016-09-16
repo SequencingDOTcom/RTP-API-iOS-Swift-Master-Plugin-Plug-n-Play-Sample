@@ -1,0 +1,6 @@
+framework module sequencing_app_chains_api_swift {
+  umbrella header "sequencing-app-chains-api-swift-umbrella.h"
+
+  export *
+  module * { export * }
+}
