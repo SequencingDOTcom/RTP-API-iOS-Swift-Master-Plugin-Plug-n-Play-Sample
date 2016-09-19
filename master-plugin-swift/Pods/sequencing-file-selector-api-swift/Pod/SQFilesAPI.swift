@@ -17,12 +17,12 @@ import Foundation
 public class SQFilesAPI: NSObject {
     
     
-    weak var selectedFileDelegate: SQFileSelectorProtocolDelegate?
+    public weak var selectedFileDelegate: SQFileSelectorProtocolDelegate?
     
-    var closeButton:    Bool = false
-    var selectedFileID: NSString?
-    var videoFileName:  NSString?
-    var accessToken = NSString()
+    public var closeButton:    Bool = false
+    public var selectedFileID: NSString?
+    public var videoFileName:  NSString?
+    public var accessToken = NSString()
     
     
     

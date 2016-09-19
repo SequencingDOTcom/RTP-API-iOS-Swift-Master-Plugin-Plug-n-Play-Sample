@@ -112,7 +112,7 @@ class LoginViewController: UIViewController, SQAuthorizationProtocolDelegate {
         if segue.destinationViewController.isKindOfClass(SelectFileViewController) {
             if sender != nil {
                 let destinationVC = segue.destinationViewController as! SelectFileViewController
-                destinationVC.token = sender as! SQToken
+                destinationVC.token = sender as! SQToken?
             }
         }
     }

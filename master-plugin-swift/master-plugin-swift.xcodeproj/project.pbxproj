@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C49AC4A1D90311700BEF813 /* AppChainsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C49AC491D90311700BEF813 /* AppChainsHelper.swift */; };
+		1C7BE72B1D9022AE00110021 /* SQFilesPopoverInfoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C7BE7281D9022AE00110021 /* SQFilesPopoverInfoViewController.xib */; };
+		1C7BE72C1D9022AE00110021 /* SQFilesPopoverMyFilesViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C7BE7291D9022AE00110021 /* SQFilesPopoverMyFilesViewController.xib */; };
+		1C7BE72D1D9022AE00110021 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C7BE72A1D9022AE00110021 /* Images.xcassets */; };
 		1C8810971D8C581B0056DF16 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C8810961D8C581B0056DF16 /* AppDelegate.swift */; };
 		1C88109C1D8C581B0056DF16 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1C88109A1D8C581B0056DF16 /* Main.storyboard */; };
 		1C88109E1D8C581B0056DF16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C88109D1D8C581B0056DF16 /* Assets.xcassets */; };
@@ -20,6 +24,10 @@
 
 /* Begin PBXFileReference section */
 		15954096ECF3C28A2CB3FD19 /* Pods-master-plugin-swift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-master-plugin-swift.release.xcconfig"; path = "Pods/Target Support Files/Pods-master-plugin-swift/Pods-master-plugin-swift.release.xcconfig"; sourceTree = "<group>"; };
+		1C49AC491D90311700BEF813 /* AppChainsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppChainsHelper.swift; sourceTree = "<group>"; };
+		1C7BE7281D9022AE00110021 /* SQFilesPopoverInfoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SQFilesPopoverInfoViewController.xib; path = "../Pods/sequencing-file-selector-api-swift/Resources/SQFilesPopoverInfoViewController.xib"; sourceTree = "<group>"; };
+		1C7BE7291D9022AE00110021 /* SQFilesPopoverMyFilesViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SQFilesPopoverMyFilesViewController.xib; path = "../Pods/sequencing-file-selector-api-swift/Resources/SQFilesPopoverMyFilesViewController.xib"; sourceTree = "<group>"; };
+		1C7BE72A1D9022AE00110021 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "../Pods/sequencing-file-selector-api-swift/Resources/Images.xcassets"; sourceTree = "<group>"; };
 		1C8810931D8C581B0056DF16 /* master-plugin-swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "master-plugin-swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C8810961D8C581B0056DF16 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1C88109B1D8C581B0056DF16 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -28,8 +36,8 @@
 		1C8810A21D8C581B0056DF16 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1C8810A91D8C5AD40056DF16 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		1C8810AB1D8C5B010056DF16 /* SelectFileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectFileViewController.swift; sourceTree = "<group>"; };
-		1C8810AD1D8C608E0056DF16 /* TabbarFileSelector.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = TabbarFileSelector.storyboard; path = "Pods/sequencing-file-selector-api-swift/Resources/TabbarFileSelector.storyboard"; sourceTree = "<group>"; };
-		1C8810AF1D8C62F80056DF16 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = "Pods/sequencing-oauth-api-swift/Resources/Assets.xcassets"; sourceTree = "<group>"; };
+		1C8810AD1D8C608E0056DF16 /* TabbarFileSelector.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = TabbarFileSelector.storyboard; path = "../Pods/sequencing-file-selector-api-swift/Resources/TabbarFileSelector.storyboard"; sourceTree = "<group>"; };
+		1C8810AF1D8C62F80056DF16 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = "../Pods/sequencing-oauth-api-swift/Resources/Assets.xcassets"; sourceTree = "<group>"; };
 		777D31F50AA74D3ACFFC491A /* Pods_master_plugin_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_master_plugin_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D1B1E45D93CF20C3A57EDD4 /* Pods-master-plugin-swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-master-plugin-swift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-master-plugin-swift/Pods-master-plugin-swift.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -49,8 +57,6 @@
 		1C88108A1D8C581B0056DF16 = {
 			isa = PBXGroup;
 			children = (
-				1C8810AF1D8C62F80056DF16 /* Assets.xcassets */,
-				1C8810AD1D8C608E0056DF16 /* TabbarFileSelector.storyboard */,
 				1C8810951D8C581B0056DF16 /* master-plugin-swift */,
 				1C8810941D8C581B0056DF16 /* Products */,
 				A88C9C338537F37A3DB1EF32 /* Pods */,
@@ -72,6 +78,7 @@
 				1C8810961D8C581B0056DF16 /* AppDelegate.swift */,
 				1C8810A91D8C5AD40056DF16 /* LoginViewController.swift */,
 				1C8810AB1D8C5B010056DF16 /* SelectFileViewController.swift */,
+				1C49AC491D90311700BEF813 /* AppChainsHelper.swift */,
 				1C88109A1D8C581B0056DF16 /* Main.storyboard */,
 				1C8810A81D8C59160056DF16 /* Supporting Files */,
 			);
@@ -81,6 +88,11 @@
 		1C8810A81D8C59160056DF16 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				1C7BE7281D9022AE00110021 /* SQFilesPopoverInfoViewController.xib */,
+				1C7BE7291D9022AE00110021 /* SQFilesPopoverMyFilesViewController.xib */,
+				1C7BE72A1D9022AE00110021 /* Images.xcassets */,
+				1C8810AF1D8C62F80056DF16 /* Assets.xcassets */,
+				1C8810AD1D8C608E0056DF16 /* TabbarFileSelector.storyboard */,
 				1C88109D1D8C581B0056DF16 /* Assets.xcassets */,
 				1C88109F1D8C581B0056DF16 /* LaunchScreen.storyboard */,
 				1C8810A21D8C581B0056DF16 /* Info.plist */,
@@ -166,6 +178,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C7BE72B1D9022AE00110021 /* SQFilesPopoverInfoViewController.xib in Resources */,
+				1C7BE72C1D9022AE00110021 /* SQFilesPopoverMyFilesViewController.xib in Resources */,
+				1C7BE72D1D9022AE00110021 /* Images.xcassets in Resources */,
 				1C8810B01D8C62F80056DF16 /* Assets.xcassets in Resources */,
 				1C8810AE1D8C608E0056DF16 /* TabbarFileSelector.storyboard in Resources */,
 				1C8810A11D8C581B0056DF16 /* LaunchScreen.storyboard in Resources */,
@@ -232,6 +247,7 @@
 				1C8810AA1D8C5AD40056DF16 /* LoginViewController.swift in Sources */,
 				1C8810AC1D8C5B010056DF16 /* SelectFileViewController.swift in Sources */,
 				1C8810971D8C581B0056DF16 /* AppDelegate.swift in Sources */,
+				1C49AC4A1D90311700BEF813 /* AppChainsHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

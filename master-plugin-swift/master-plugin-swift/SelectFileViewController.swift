@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import QuartzCore
 
 // ADD THIS POD IMPORT
 import sequencing_oauth_api_swift
@@ -14,35 +15,236 @@ import sequencing_file_selector_api_swift
 import sequencing_app_chains_api_swift
     
 
-class SelectFileViewController: UIViewController {
+class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate, SQFileSelectorProtocolDelegate {
     
     
     let kMainQueue = dispatch_get_main_queue()
-    let SELECT_FILES_CONTROLLER_SEGUE_ID = "SELECT_FILES"
+    let FILES_CONTROLLER_SEGUE_ID = "GET_FILES"
+    
+    // actiity indicator
+    var messageFrame = UIView()
+    var strLabel = UILabel()
+    var activityIndicator = UIActivityIndicatorView()
     
     var token: SQToken?
+    var selectedFile = NSDictionary()
     
-
+    // UI items
+    @IBOutlet weak var buttonSelectFile: UIButton!
+    @IBOutlet weak var buttonView: UIView!
+    
+    @IBOutlet weak var getFileInfo: UISegmentedControl!
+    @IBOutlet weak var segmentedControlView: UIView!
+    
+    @IBOutlet weak var selectedFileTagline: UILabel!
+    @IBOutlet weak var selectedFileName: UILabel!
+    
+    @IBOutlet weak var vitaminDInfo: UILabel!
+    @IBOutlet weak var melanomaInfo: UILabel!
+    
+    
+    
+    // MARK: - View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+        self.title = "Using genetic file"
+        
+        // subscribe self as delegate to SQTokenRefreshProtocol
+        SQOAuth.instance.refreshTokenDelegate = self
+        
+        // subscribe self as delegate to SQFileSelectorProtocol
+        SQFilesAPI.instance.selectedFileDelegate = self
+        SQFilesAPI.instance.closeButton = true
+        
+        // adjust buttons view
+        buttonView.layer.cornerRadius = 5
+        buttonView.layer.masksToBounds = true
+        segmentedControlView.layer.cornerRadius = 5
+        segmentedControlView.layer.masksToBounds = true
+        
+        selectedFileTagline.hidden = true
+        selectedFileName.hidden = true
+        getFileInfo.hidden = true
+        segmentedControlView.hidden = true
+        vitaminDInfo.hidden = true
+        melanomaInfo.hidden = true
     }
-
+    
+    
+    deinit {
+        SQOAuth.instance.refreshTokenDelegate = nil
+        SQFilesAPI.instance.selectedFileDelegate = nil
+    }
+    
+    
+    
+    // MARK: - Actions
+    @IBAction func loadFilesButtonPressed(sender: AnyObject) {
+        self.view.userInteractionEnabled = false
+        self.startActivityIndicatorWithTitle("Loading Files")
+        
+        selectedFileTagline.hidden = true
+        selectedFileName.hidden = true
+        getFileInfo.hidden = true
+        segmentedControlView.hidden = true
+        vitaminDInfo.hidden = true
+        melanomaInfo.hidden = true
+        
+        print(self.token)
+        if self.token != nil {
+            SQFilesAPI.instance.loadFilesWithToken(self.token!.accessToken, success: { (success) in
+                dispatch_async(self.kMainQueue) {
+                    if success {
+                        self.stopActivityIndicator()
+                        self.view.userInteractionEnabled = true
+                        self.performSegueWithIdentifier(self.FILES_CONTROLLER_SEGUE_ID, sender: nil)
+                        
+                    } else {
+                        self.stopActivityIndicator()
+                        self.view.userInteractionEnabled = true
+                        self.showAlertWithMessage("Sorry, can't load genetic files")
+                    }
+                }
+            })
+        } else {
+            self.showAlertWithMessage("Sorry, can't load genetic files > token is empty")
+        }
+    }
+    
+    
+    
+    
+    // MARK: - SQFileSelectorProtocolDelegate
+    func handleFileSelected(file: NSDictionary) -> Void {
+        self.dismissViewControllerAnimated(true, completion: nil)
+        print(file)
+        if file.allKeys.count > 0 {
+            dispatch_async(self.kMainQueue) {
+                self.stopActivityIndicator()
+                self.view.userInteractionEnabled = true
+                self.selectedFile = file
+                let fileCategory = file.objectForKey("FileCategory") as! String
+                var fileName: NSString
+                
+                if fileCategory.rangeOfString("Community") != nil {
+                    fileName = NSString(format: "%@ - %@", file.objectForKey("FriendlyDesc1") as! NSString, file.objectForKey("FriendlyDesc2") as! NSString)
+                } else {
+                    fileName = NSString(format: "%@", file.objectForKey("Name") as! NSString)
+                }
+                
+                self.selectedFileName.text = fileName as String
+                
+                self.selectedFileTagline.hidden = false
+                self.selectedFileName.hidden = false
+                self.getFileInfo.hidden = false
+                self.segmentedControlView.hidden = false
+            }
+        } else {
+            dispatch_async(kMainQueue, {
+                self.stopActivityIndicator()
+                self.view.userInteractionEnabled = true
+                self.showAlertWithMessage("Sorry, can't load genetic files")
+                
+                self.selectedFileTagline.hidden = true
+                self.selectedFileName.hidden = true
+                self.getFileInfo.hidden = true
+                self.segmentedControlView.hidden = true
+            })
+        }
+    }
+    
+    func closeButtonPressed() -> Void {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    
+    
+    // MARK: - Get genetic information
+    @IBAction func getGeneticInfoPressed(sender: UISegmentedControl) {
+        if self.selectedFile.allKeys.count > 0 {
+            if let selectedSegmentItem = sender.titleForSegmentAtIndex(sender.selectedSegmentIndex) {
+                
+                if selectedSegmentItem.rangeOfString("vitamin") != nil {
+                    
+                } else {
+                    
+                }
+            }
+        } else {
+            self.showAlertWithMessage("Please select genetic file above")
+        }
+    }
+    
+    
+    
+    func getVitaminDInfo() -> Void {
+        self.view.userInteractionEnabled = false
+        self.startActivityIndicatorWithTitle("Loading info...")
+        
+        let appChainsHelper = AppChainsHelper()
+        
+        
+    }
+    
+    
+    
+    // MARK: - SQTokenRefreshProtocolDelegate
+    func tokenIsRefreshed(updatedToken: SQToken) -> Void {
+        
+    }
+    
+    
+    
+    
+    // MARK: - Activity indicator
+    func startActivityIndicatorWithTitle(title: String) -> Void {
+        dispatch_async(kMainQueue) { () -> Void in
+            
+            self.strLabel = UILabel(frame: CGRect(x: 30, y: 0, width: 90, height: 30))
+            self.strLabel.text = title
+            self.strLabel.font = UIFont.systemFontOfSize(13)
+            self.strLabel.textColor = UIColor.grayColor()
+            
+            let xPos: CGFloat = self.view.frame.midX - 60
+            // let yPos: CGFloat = self.mainVC.view.frame.midY + 50
+            self.messageFrame = UIView(frame: CGRect(x: xPos, y: 60, width: 120, height: 30))
+            self.messageFrame.layer.cornerRadius = 15
+            self.messageFrame.backgroundColor = UIColor.clearColor()
+            
+            self.activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.Gray)
+            self.activityIndicator.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+            self.activityIndicator.startAnimating()
+            
+            self.messageFrame.addSubview(self.activityIndicator)
+            self.messageFrame.addSubview(self.strLabel)
+            self.view.addSubview(self.messageFrame)
+        }
+    }
+    
+    
+    func stopActivityIndicator() -> Void {
+        dispatch_async(kMainQueue) { () -> Void in
+            self.activityIndicator.stopAnimating()
+            self.messageFrame.removeFromSuperview()
+        }
+    }
+    
+    
+    // MARK: - Alert message
+    func showAlertWithMessage(message: NSString) -> Void {
+        let alert = UIAlertController(title: nil, message: message as String, preferredStyle: .Alert)
+        let close = UIAlertAction(title: "Close", style: .Default, handler: nil)
+        alert.addAction(close)
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+    
 }
