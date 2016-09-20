@@ -1,7 +1,5 @@
 //
 //  AppDelegate.swift
-//  master-plugin-swift
-//
 //  Copyright © 2016 Sequencing.com. All rights reserved.
 //
 

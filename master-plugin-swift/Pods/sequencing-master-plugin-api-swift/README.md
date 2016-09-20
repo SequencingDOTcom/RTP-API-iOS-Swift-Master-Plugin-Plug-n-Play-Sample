@@ -1,5 +1,3 @@
-# COMING SOON!
-
 # Master CocoPod Plugin for adding Squencing.com's Real-Time Personalization technology to iOS apps coded in Swift
 =========================================
 This Master CocoPod Plugin can be used to quickly add Real-Time Personalization to your app. This Master Plugin contains a customizable, end-to-end plug-n-play solution that quickly adds all necessary code (OAuth2, File Selector and App Chain coding) to your app.
@@ -17,6 +15,11 @@ To code Real-Time Personalization technology into apps, developers may [register
 * [Objective-C (CocoaPod plugin)](https://github.com/SequencingDOTcom/CocoaPod-iOS-Master-Plugin-ObjectiveC) 
 * [Android (Maven plugin)](https://github.com/SequencingDOTcom/Maven-Android-Master-Plugin-Java)
 * [Java (Maven plugin)](https://github.com/SequencingDOTcom/Maven-Android-Master-Plugin-Java)
+
+**Master Plugin - Plug-n-Play Samples** (This code can be used as an out-of-the-box solution to quickly add Real-Time Personalization technology into your app):
+* [Swift (CocoaPod) Plug-n-Play Sample](https://github.com/SequencingDOTcom/iOS-Swift-Master-Plugin-Plug-n-Play-Sample)
+* [Objective-C (CocoaPod) Plug-n-Play Sample](https://github.com/SequencingDOTcom/iOS-Objective-C-Master-Plugin-Plug-n-Play-Sample)
+* [Android (Maven) Plug-n-Play Sample](https://github.com/SequencingDOTcom/Android-Master-Plugin-Plug-N-Play-Sample)
 
 Contents
 =========================================

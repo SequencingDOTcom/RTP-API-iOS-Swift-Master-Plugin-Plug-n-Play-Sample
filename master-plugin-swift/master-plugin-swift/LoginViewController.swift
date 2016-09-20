@@ -1,8 +1,5 @@
 //
 //  LoginViewController.swift
-//  master-plugin-swift
-//
-//  Created by Bogdan Laukhin on 9/16/16.
 //  Copyright © 2016 Sequencing.com. All rights reserved.
 //
 
@@ -21,7 +18,7 @@ class LoginViewController: UIViewController, SQAuthorizationProtocolDelegate {
     let CLIENT_ID: String       = "oAuth2 Demo ObjectiveC"
     let CLIENT_SECRET: String   = "RZw8FcGerU9e1hvS5E-iuMb8j8Qa9cxI-0vfXnVRGaMvMT3TcvJme-Pnmr635IoE434KXAjelp47BcWsCrhk0g"
     let REDIRECT_URI: String    = "authapp://Default/Authcallback"
-    let SCOPE: String           = "demo"
+    let SCOPE: String           = "demo,external"
     
     let kMainQueue = dispatch_get_main_queue()
     let SELECT_FILES_CONTROLLER_SEGUE_ID = "SELECT_FILES"

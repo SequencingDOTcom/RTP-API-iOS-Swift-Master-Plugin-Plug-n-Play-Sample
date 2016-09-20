@@ -1,8 +1,5 @@
 //
 //  SelectFileViewController.swift
-//  master-plugin-swift
-//
-//  Created by Bogdan Laukhin on 9/16/16.
 //  Copyright © 2016 Sequencing.com. All rights reserved.
 //
 
@@ -19,6 +16,7 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
     
     
     let kMainQueue = dispatch_get_main_queue()
+    let kBackgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
     let FILES_CONTROLLER_SEGUE_ID = "GET_FILES"
     
     // actiity indicator
@@ -166,9 +164,9 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
             if let selectedSegmentItem = sender.titleForSegmentAtIndex(sender.selectedSegmentIndex) {
                 
                 if selectedSegmentItem.rangeOfString("vitamin") != nil {
-                    
+                    self.getVitaminDInfo()
                 } else {
-                    
+                    self.getMelanomaInfo()
                 }
             }
         } else {
@@ -179,15 +177,107 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
     
     
     func getVitaminDInfo() -> Void {
-        self.view.userInteractionEnabled = false
-        self.startActivityIndicatorWithTitle("Loading info...")
-        
-        let appChainsHelper = AppChainsHelper()
-        
-        
+        if selectedFile.allKeys.count > 0 && token != nil {
+            if let fileID = selectedFile.objectForKey("Id") as! NSString? {
+                
+                self.view.userInteractionEnabled = false
+                self.startActivityIndicatorWithTitle("Loading info...")
+                
+                dispatch_async(self.kBackgroundQueue, {
+                    AppChainsHelper.requestForChain88BasedOnFileID(fileID as String, accessToken: self.token!.accessToken, completion: { (vitaminDValue) in
+                        print(vitaminDValue)
+                        
+                        if vitaminDValue != nil && vitaminDValue?.length > 0 {
+                            dispatch_async(self.kMainQueue, {
+                                if (vitaminDValue! as String).lowercaseString.rangeOfString("false") != nil {
+                                    self.stopActivityIndicator()
+                                    self.view.userInteractionEnabled = true
+                                    self.vitaminDInfo.hidden = false
+                                    self.vitaminDInfo.text = "There is no issue with vitamin D"
+                                    
+                                } else if (vitaminDValue! as String).lowercaseString.rangeOfString("true") != nil {
+                                    self.stopActivityIndicator()
+                                    self.view.userInteractionEnabled = true
+                                    self.vitaminDInfo.hidden = false
+                                    self.vitaminDInfo.text = "There is an issue with vitamin D"
+                                    
+                                } else {
+                                    self.stopActivityIndicator()
+                                    self.view.userInteractionEnabled = true
+                                    self.vitaminDInfo.hidden = true
+                                    self.vitaminDInfo.text = "Sorry, there is invalid vitamin D information"
+                                }
+                            })
+                        } else {
+                            dispatch_async(self.kMainQueue, {
+                                self.stopActivityIndicator()
+                                self.view.userInteractionEnabled = true
+                                self.vitaminDInfo.hidden = true
+                                self.vitaminDInfo.text = "There is error from the server. Probably it's because you're using demo app parameters.\nPlease get valid CLIENT_ID and CLIENT_SECRET for your app in Developer Center on sequencing.com"
+                            })
+                        }
+                    })
+                })
+            } else {
+                self.view.userInteractionEnabled = true
+                self.vitaminDInfo.hidden = true
+                self.showAlertWithMessage("Corrupted selected file, can't load vitamin D information.")
+            }
+        } else {
+            self.view.userInteractionEnabled = true
+            self.vitaminDInfo.hidden = true
+            self.showAlertWithMessage("Corrupted user info, can't load vitamin D information.")
+        }
     }
     
     
+    func getMelanomaInfo() -> Void {
+        if selectedFile.allKeys.count > 0 && token != nil {
+            if let fileID = selectedFile.objectForKey("Id") as! NSString? {
+                
+                self.view.userInteractionEnabled = false
+                self.startActivityIndicatorWithTitle("Loading info...")
+                
+                dispatch_async(kBackgroundQueue, {
+                    AppChainsHelper.requestForChain9BasedOnFileID(fileID as String, accessToken: self.token!.accessToken, completion: { (melanomaRiskValue) in
+                        print(melanomaRiskValue)
+                        
+                        if melanomaRiskValue != nil && melanomaRiskValue?.length > 0 {
+                            dispatch_async(self.kMainQueue, {
+                                self.stopActivityIndicator()
+                                self.view.userInteractionEnabled = true
+                                self.melanomaInfo.hidden = false
+                                self.melanomaInfo.text = NSString(format: "Melanoma issue level is: %@", (melanomaRiskValue! as String).capitalizedString) as String
+                            })
+                        } else {
+                            dispatch_async(self.kMainQueue, {
+                                self.stopActivityIndicator()
+                                self.view.userInteractionEnabled = true
+                                self.melanomaInfo.hidden = true
+                                self.showAlertWithMessage("There is error from the server. Probably it's because you're using demo app parameters.\nPlease get valid CLIENT_ID and CLIENT_SECRET for your app in Developer Center on sequencing.com")
+                            })
+                        }
+                    })
+                })
+            } else {
+                dispatch_async(self.kMainQueue, {
+                    self.stopActivityIndicator()
+                    self.view.userInteractionEnabled = true
+                    self.melanomaInfo.hidden = true
+                    self.showAlertWithMessage("Corrupted selected file, can't load melanoma information.")
+                })
+            }
+        } else {
+            dispatch_async(self.kMainQueue, {
+                self.stopActivityIndicator()
+                self.view.userInteractionEnabled = true
+                self.melanomaInfo.hidden = true
+                self.showAlertWithMessage("Corrupted user info, can't load melanoma information.")
+            })
+        }
+    }
+    
+        
     
     // MARK: - SQTokenRefreshProtocolDelegate
     func tokenIsRefreshed(updatedToken: SQToken) -> Void {

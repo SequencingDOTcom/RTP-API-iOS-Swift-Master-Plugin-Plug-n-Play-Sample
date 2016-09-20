@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'CD72BA708785BA17BF7E7D23'
+               BlueprintIdentifier = '16286D0C28B2ECCD322CDD83'
                BlueprintName = 'sequencing-oauth-api-swift'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'sequencing_oauth_api_swift.framework'>

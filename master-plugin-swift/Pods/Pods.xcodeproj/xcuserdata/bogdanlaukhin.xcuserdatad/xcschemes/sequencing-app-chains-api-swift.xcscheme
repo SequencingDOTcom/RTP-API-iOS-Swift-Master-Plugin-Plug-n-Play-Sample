@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'E6830F01993E4A470E4CCED9'
+               BlueprintIdentifier = 'A14950DD0669E2F97AF7038E'
                BlueprintName = 'sequencing-app-chains-api-swift'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'sequencing_app_chains_api_swift.framework'>

@@ -34,7 +34,7 @@
                                 <rect key="frame" x="239" y="116" width="123" height="30"/>
                                 <state key="normal" title="Select genetic file"/>
                                 <connections>
-                                    <action selector="loadFilesButtonPressed:" destination="i1D-oF-EL0" eventType="touchUpInside" id="Wye-vQ-Lmn"/>
+                                    <action selector="loadFilesButtonPressed:" destination="i1D-oF-EL0" eventType="touchUpInside" id="9V8-Ta-qM2"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Selected genetic file:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0ff-hO-F4Z" userLabel="selectFile tagline">
@@ -53,14 +53,14 @@
                                 <rect key="frame" x="172" y="263" width="257" height="28"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="m7W-ma-8tD" userLabel="segmentedControl">
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" momentary="YES" translatesAutoresizingMaskIntoConstraints="NO" id="m7W-ma-8tD" userLabel="segmentedControl">
                                 <rect key="frame" x="172" y="263" width="257" height="29"/>
                                 <segments>
                                     <segment title="Get vitamin D info"/>
                                     <segment title="Get Melanoma risk"/>
                                 </segments>
                                 <connections>
-                                    <action selector="getGeneticInfoPressed:" destination="i1D-oF-EL0" eventType="valueChanged" id="B78-fO-SvX"/>
+                                    <action selector="getGeneticInfoPressed:" destination="i1D-oF-EL0" eventType="valueChanged" id="qwG-L9-7sT"/>
                                 </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Aa-HP-gJR" userLabel="vitaminD">
@@ -104,15 +104,14 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="buttonSelectFile" destination="uNH-KZ-QDL" id="rMq-Wn-qft"/>
-                        <outlet property="buttonView" destination="gt8-mS-h9x" id="J8R-wY-5bi"/>
-                        <outlet property="getFileInfo" destination="m7W-ma-8tD" id="9Dt-oQ-3eH"/>
-                        <outlet property="getGeneticInfoPressed" destination="m7W-ma-8tD" id="sXR-z3-gXT"/>
-                        <outlet property="melanomaInfo" destination="3Wp-DB-5R1" id="Nxr-hJ-QZk"/>
-                        <outlet property="segmentedControlView" destination="p0l-x8-zQ2" id="dcu-ta-Yul"/>
-                        <outlet property="selectedFileName" destination="mXz-M9-kL0" id="dsR-5U-IbV"/>
-                        <outlet property="selectedFileTagline" destination="0ff-hO-F4Z" id="xfO-Hg-19Y"/>
-                        <outlet property="vitaminDInfo" destination="0Aa-HP-gJR" id="dQc-lj-uCG"/>
+                        <outlet property="buttonSelectFile" destination="uNH-KZ-QDL" id="bK5-zB-17S"/>
+                        <outlet property="buttonView" destination="gt8-mS-h9x" id="NkI-q3-9Bu"/>
+                        <outlet property="getFileInfo" destination="m7W-ma-8tD" id="stA-kU-Bqu"/>
+                        <outlet property="melanomaInfo" destination="3Wp-DB-5R1" id="O7k-7a-Izb"/>
+                        <outlet property="segmentedControlView" destination="p0l-x8-zQ2" id="Cb5-FS-6D2"/>
+                        <outlet property="selectedFileName" destination="mXz-M9-kL0" id="7kc-3z-pXU"/>
+                        <outlet property="selectedFileTagline" destination="0ff-hO-F4Z" id="MQG-Dy-zcJ"/>
+                        <outlet property="vitaminDInfo" destination="0Aa-HP-gJR" id="v1j-zY-cM2"/>
                         <segue destination="6Uq-Oz-rd0" kind="presentation" identifier="GET_FILES" modalTransitionStyle="crossDissolve" id="mfI-w6-Hf0"/>
                     </connections>
                 </viewController>

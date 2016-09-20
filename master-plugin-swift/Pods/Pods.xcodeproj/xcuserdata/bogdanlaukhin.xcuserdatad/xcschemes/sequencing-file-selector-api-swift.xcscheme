@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '26CEBE4A2976D6A87B01B848'
+               BlueprintIdentifier = 'D7366C89A44D709B7EC72348'
                BlueprintName = 'sequencing-file-selector-api-swift'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'sequencing_file_selector_api_swift.framework'>

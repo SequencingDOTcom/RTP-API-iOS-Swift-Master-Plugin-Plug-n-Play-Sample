@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'E2B2BD6A64CF456BB341038B'
+               BlueprintIdentifier = 'D68F5D01A33CF43A0FC57302'
                BlueprintName = 'Pods-master-plugin-swift'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'Pods_master_plugin_swift.framework'>
