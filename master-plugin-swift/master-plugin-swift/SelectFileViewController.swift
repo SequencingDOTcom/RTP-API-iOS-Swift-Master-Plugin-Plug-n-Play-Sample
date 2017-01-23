@@ -1,23 +1,26 @@
 //
 //  SelectFileViewController.swift
-//  Copyright © 2016 Sequencing.com. All rights reserved.
+//  Copyright © 2017 Sequencing.com. All rights reserved.
 //
 
 import UIKit
 import QuartzCore
 
 // ADD THIS POD IMPORT
-import sequencing_oauth_api_swift
 import sequencing_file_selector_api_swift
-import sequencing_app_chains_api_swift
+
     
 
-class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate, SQFileSelectorProtocolDelegate {
+class SelectFileViewController: UIViewController, SQTokenRefreshProtocol, SQFileSelectorProtocol {
     
     
-    let kMainQueue = dispatch_get_main_queue()
-    let kBackgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+    let kMainQueue = DispatchQueue.main
+    let kBackgroundQueue = DispatchQueue.global()
     let FILES_CONTROLLER_SEGUE_ID = "GET_FILES"
+    
+    let oauthApiHelper = SQOAuth()
+    let filesApiHelper = SQFilesAPI.instance
+    let appChainsHelper = AppChainsHelper()
     
     // actiity indicator
     var messageFrame = UIView()
@@ -34,6 +37,10 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
     @IBOutlet weak var getFileInfo: UISegmentedControl!
     @IBOutlet weak var segmentedControlView: UIView!
     
+    
+    @IBOutlet weak var batchButtonView: UIView!
+    @IBOutlet weak var batchButton: UIButton!
+    
     @IBOutlet weak var selectedFileTagline: UILabel!
     @IBOutlet weak var selectedFileName: UILabel!
     
@@ -49,63 +56,76 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
         self.title = "Using genetic file"
         
         // subscribe self as delegate to SQTokenRefreshProtocol
-        SQOAuth.instance.refreshTokenDelegate = self
+        self.oauthApiHelper.refreshTokenDelegate = self
         
         // subscribe self as delegate to SQFileSelectorProtocol
-        SQFilesAPI.instance.selectedFileDelegate = self
-        SQFilesAPI.instance.closeButton = true
+        self.filesApiHelper.selectedFileDelegate = self
+        self.filesApiHelper.closeButton = true
         
         // adjust buttons view
         buttonView.layer.cornerRadius = 5
         buttonView.layer.masksToBounds = true
+        buttonView.layer.borderColor = UIColor.init(colorLiteralRed: 35/255.0, green: 121/255.0, blue: 254/255.0, alpha: 1.0).cgColor
+        buttonView.layer.borderWidth = 1.0
+        
         segmentedControlView.layer.cornerRadius = 5
         segmentedControlView.layer.masksToBounds = true
         
-        selectedFileTagline.hidden = true
-        selectedFileName.hidden = true
-        getFileInfo.hidden = true
-        segmentedControlView.hidden = true
-        vitaminDInfo.hidden = true
-        melanomaInfo.hidden = true
+        batchButtonView.layer.cornerRadius = 5
+        batchButtonView.layer.masksToBounds = true
+        batchButtonView.layer.borderColor = UIColor.init(colorLiteralRed: 35/255.0, green: 121/255.0, blue: 254/255.0, alpha: 1.0).cgColor
+        batchButtonView.layer.borderWidth = 1.0
+            
+        selectedFileTagline.isHidden = true
+        selectedFileName.isHidden = true
+        getFileInfo.isHidden = true
+        segmentedControlView.isHidden = true
+        batchButtonView.isHidden = true
+        batchButton.isHidden = true
+        vitaminDInfo.isHidden = true
+        melanomaInfo.isHidden = true
     }
     
     
     deinit {
-        SQOAuth.instance.refreshTokenDelegate = nil
-        SQFilesAPI.instance.selectedFileDelegate = nil
+        self.oauthApiHelper.refreshTokenDelegate = nil
+        self.filesApiHelper.selectedFileDelegate = nil
     }
     
     
     
     // MARK: - Actions
-    @IBAction func loadFilesButtonPressed(sender: AnyObject) {
-        self.view.userInteractionEnabled = false
+    @IBAction func loadFilesButtonPressed(_ sender: AnyObject) {
+        self.view.isUserInteractionEnabled = false
         self.startActivityIndicatorWithTitle("Loading Files")
         
-        selectedFileTagline.hidden = true
-        selectedFileName.hidden = true
-        getFileInfo.hidden = true
-        segmentedControlView.hidden = true
-        vitaminDInfo.hidden = true
-        melanomaInfo.hidden = true
+        selectedFileTagline.isHidden = true
+        selectedFileName.isHidden = true
+        getFileInfo.isHidden = true
+        segmentedControlView.isHidden = true
+        batchButtonView.isHidden = true
+        batchButton.isHidden = true
+        vitaminDInfo.isHidden = true
+        melanomaInfo.isHidden = true
         
-        print(self.token)
         if self.token != nil {
-            SQFilesAPI.instance.loadFilesWithToken(self.token!.accessToken, success: { (success) in
-                dispatch_async(self.kMainQueue) {
+            self.filesApiHelper.loadFilesWithToken(self.token!.accessToken as NSString, success: { (success) in
+                
+                self.kMainQueue.async {
                     if success {
                         self.stopActivityIndicator()
-                        self.view.userInteractionEnabled = true
-                        self.performSegueWithIdentifier(self.FILES_CONTROLLER_SEGUE_ID, sender: nil)
+                        self.view.isUserInteractionEnabled = true
+                        self.performSegue(withIdentifier: self.FILES_CONTROLLER_SEGUE_ID, sender: nil)
                         
                     } else {
                         self.stopActivityIndicator()
-                        self.view.userInteractionEnabled = true
+                        self.view.isUserInteractionEnabled = true
                         self.showAlertWithMessage("Sorry, can't load genetic files")
                     }
                 }
             })
         } else {
+            self.stopActivityIndicator()
             self.showAlertWithMessage("Sorry, can't load genetic files > token is empty")
         }
     }
@@ -114,57 +134,65 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
     
     
     // MARK: - SQFileSelectorProtocolDelegate
-    func handleFileSelected(file: NSDictionary) -> Void {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    func handleFileSelected(_ file: NSDictionary) -> Void {
+        self.dismiss(animated: true, completion: nil)
         print(file)
+        
         if file.allKeys.count > 0 {
-            dispatch_async(self.kMainQueue) {
+            self.kMainQueue.async {
                 self.stopActivityIndicator()
-                self.view.userInteractionEnabled = true
+                self.view.isUserInteractionEnabled = true
                 self.selectedFile = file
-                let fileCategory = file.objectForKey("FileCategory") as! String
+                let fileCategory = file.object(forKey: "FileCategory") as! String
                 var fileName: NSString
                 
-                if fileCategory.rangeOfString("Community") != nil {
-                    fileName = NSString(format: "%@ - %@", file.objectForKey("FriendlyDesc1") as! NSString, file.objectForKey("FriendlyDesc2") as! NSString)
+                if fileCategory.range(of: "Community") != nil {
+                    fileName = NSString(format: "%@ - %@", file.object(forKey: "FriendlyDesc1") as! NSString, file.object(forKey: "FriendlyDesc2") as! NSString)
                 } else {
-                    fileName = NSString(format: "%@", file.objectForKey("Name") as! NSString)
+                    fileName = NSString(format: "%@", file.object(forKey: "Name") as! NSString)
                 }
                 
                 self.selectedFileName.text = fileName as String
                 
-                self.selectedFileTagline.hidden = false
-                self.selectedFileName.hidden = false
-                self.getFileInfo.hidden = false
-                self.segmentedControlView.hidden = false
+                self.selectedFileTagline.isHidden = false
+                self.selectedFileName.isHidden = false
+                self.getFileInfo.isHidden = false
+                self.segmentedControlView.isHidden = false
+                self.batchButtonView.isHidden = false
+                self.batchButton.isHidden = false
             }
         } else {
-            dispatch_async(kMainQueue, {
+            kMainQueue.async {
                 self.stopActivityIndicator()
-                self.view.userInteractionEnabled = true
+                self.view.isUserInteractionEnabled = true
                 self.showAlertWithMessage("Sorry, can't load genetic files")
                 
-                self.selectedFileTagline.hidden = true
-                self.selectedFileName.hidden = true
-                self.getFileInfo.hidden = true
-                self.segmentedControlView.hidden = true
-            })
+                self.selectedFileTagline.isHidden = true
+                self.selectedFileName.isHidden = true
+                self.getFileInfo.isHidden = true
+                self.segmentedControlView.isHidden = true
+                self.batchButtonView.isHidden = true
+                self.batchButton.isHidden = true
+            }
         }
     }
     
+    
     func closeButtonPressed() -> Void {
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.stopActivityIndicator()
+        self.dismiss(animated: true, completion: nil)
     }
     
     
     
     // MARK: - Get genetic information
-    @IBAction func getGeneticInfoPressed(sender: UISegmentedControl) {
+    @IBAction func getGeneticInfoPressed(_ sender: UISegmentedControl) {
         if self.selectedFile.allKeys.count > 0 {
-            if let selectedSegmentItem = sender.titleForSegmentAtIndex(sender.selectedSegmentIndex) {
+            if let selectedSegmentItem = sender.titleForSegment(at: sender.selectedSegmentIndex) {
                 
-                if selectedSegmentItem.rangeOfString("vitamin") != nil {
+                if selectedSegmentItem.range(of: "vitamin") != nil {
                     self.getVitaminDInfo()
+                    
                 } else {
                     self.getMelanomaInfo()
                 }
@@ -178,54 +206,26 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
     
     func getVitaminDInfo() -> Void {
         if selectedFile.allKeys.count > 0 && token != nil {
-            if let fileID = selectedFile.objectForKey("Id") as! NSString? {
+            if let fileID = selectedFile.object(forKey: "Id") as! NSString? {
                 
-                self.view.userInteractionEnabled = false
+                self.vitaminDInfo.isHidden = true
+                self.view.isUserInteractionEnabled = false
                 self.startActivityIndicatorWithTitle("Loading info...")
                 
-                dispatch_async(self.kBackgroundQueue, {
-                    AppChainsHelper.requestForChain88BasedOnFileID(fileID as String, accessToken: self.token!.accessToken, completion: { (vitaminDValue) in
-                        print(vitaminDValue)
+                self.kBackgroundQueue.async {
+                    self.appChainsHelper.requestForChain88BasedOnFileID(fileID: fileID as String, accessToken: self.token!.accessToken, completion: { (vitaminDValue) in
                         
-                        if vitaminDValue != nil && vitaminDValue?.length > 0 {
-                            dispatch_async(self.kMainQueue, {
-                                if (vitaminDValue! as String).lowercaseString.rangeOfString("false") != nil {
-                                    self.stopActivityIndicator()
-                                    self.view.userInteractionEnabled = true
-                                    self.vitaminDInfo.hidden = false
-                                    self.vitaminDInfo.text = "There is no issue with vitamin D"
-                                    
-                                } else if (vitaminDValue! as String).lowercaseString.rangeOfString("true") != nil {
-                                    self.stopActivityIndicator()
-                                    self.view.userInteractionEnabled = true
-                                    self.vitaminDInfo.hidden = false
-                                    self.vitaminDInfo.text = "There is an issue with vitamin D"
-                                    
-                                } else {
-                                    self.stopActivityIndicator()
-                                    self.view.userInteractionEnabled = true
-                                    self.vitaminDInfo.hidden = true
-                                    self.vitaminDInfo.text = "Sorry, there is invalid vitamin D information"
-                                }
-                            })
-                        } else {
-                            dispatch_async(self.kMainQueue, {
-                                self.stopActivityIndicator()
-                                self.view.userInteractionEnabled = true
-                                self.vitaminDInfo.hidden = true
-                                self.vitaminDInfo.text = "There is error from the server. Probably it's because you're using demo app parameters.\nPlease get valid CLIENT_ID and CLIENT_SECRET for your app in Developer Center on sequencing.com"
-                            })
-                        }
+                        self.handleVitaminDLabel(vitaminDValue)
                     })
-                })
+                }
             } else {
-                self.view.userInteractionEnabled = true
-                self.vitaminDInfo.hidden = true
+                self.view.isUserInteractionEnabled = true
+                self.vitaminDInfo.isHidden = true
                 self.showAlertWithMessage("Corrupted selected file, can't load vitamin D information.")
             }
         } else {
-            self.view.userInteractionEnabled = true
-            self.vitaminDInfo.hidden = true
+            self.view.isUserInteractionEnabled = true
+            self.vitaminDInfo.isHidden = true
             self.showAlertWithMessage("Corrupted user info, can't load vitamin D information.")
         }
     }
@@ -233,76 +233,177 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
     
     func getMelanomaInfo() -> Void {
         if selectedFile.allKeys.count > 0 && token != nil {
-            if let fileID = selectedFile.objectForKey("Id") as! NSString? {
+            if let fileID = selectedFile.object(forKey: "Id") as! NSString? {
                 
-                self.view.userInteractionEnabled = false
+                self.melanomaInfo.isHidden = true
+                self.view.isUserInteractionEnabled = false
                 self.startActivityIndicatorWithTitle("Loading info...")
                 
-                dispatch_async(kBackgroundQueue, {
-                    AppChainsHelper.requestForChain9BasedOnFileID(fileID as String, accessToken: self.token!.accessToken, completion: { (melanomaRiskValue) in
-                        print(melanomaRiskValue)
+                self.kBackgroundQueue.async {
+                    self.appChainsHelper.requestForChain9BasedOnFileID(fileID: fileID as String, accessToken: self.token!.accessToken, completion: { (melanomaRiskValue) in
                         
-                        if melanomaRiskValue != nil && melanomaRiskValue?.length > 0 {
-                            dispatch_async(self.kMainQueue, {
-                                self.stopActivityIndicator()
-                                self.view.userInteractionEnabled = true
-                                self.melanomaInfo.hidden = false
-                                self.melanomaInfo.text = NSString(format: "Melanoma issue level is: %@", (melanomaRiskValue! as String).capitalizedString) as String
-                            })
-                        } else {
-                            dispatch_async(self.kMainQueue, {
-                                self.stopActivityIndicator()
-                                self.view.userInteractionEnabled = true
-                                self.melanomaInfo.hidden = true
-                                self.showAlertWithMessage("There is error from the server. Probably it's because you're using demo app parameters.\nPlease get valid CLIENT_ID and CLIENT_SECRET for your app in Developer Center on sequencing.com")
-                            })
-                        }
+                        self.handleMelanomaLabel(melanomaRiskValue)
                     })
-                })
+                }
             } else {
-                dispatch_async(self.kMainQueue, {
-                    self.stopActivityIndicator()
-                    self.view.userInteractionEnabled = true
-                    self.melanomaInfo.hidden = true
-                    self.showAlertWithMessage("Corrupted selected file, can't load melanoma information.")
-                })
+                self.stopActivityIndicator()
+                self.view.isUserInteractionEnabled = true
+                self.melanomaInfo.isHidden = true
+                self.showAlertWithMessage("Corrupted selected file, can't load melanoma information.")
             }
         } else {
-            dispatch_async(self.kMainQueue, {
-                self.stopActivityIndicator()
-                self.view.userInteractionEnabled = true
-                self.melanomaInfo.hidden = true
-                self.showAlertWithMessage("Corrupted user info, can't load melanoma information.")
-            })
+            self.stopActivityIndicator()
+            self.view.isUserInteractionEnabled = true
+            self.melanomaInfo.isHidden = true
+            self.showAlertWithMessage("Corrupted user info, can't load melanoma information.")
         }
     }
+    
+    
+    
+    @IBAction func getVitaminDMelanomaInBatchRequest(_ sender: Any) {
+        if selectedFile.allKeys.count > 0 && token != nil {
+            if let fileID = selectedFile.object(forKey: "Id") as! NSString? {
+                
+                self.vitaminDInfo.isHidden = true
+                self.melanomaInfo.isHidden = true
+                self.view.isUserInteractionEnabled = false
+                self.startActivityIndicatorWithTitle("Loading info...")
+                
+                kBackgroundQueue.async {
+                    self.appChainsHelper.batchRequestForChain88AndChain9BasedOnFileID(fileID: fileID as String, accessToken: self.token!.accessToken, completion: { (appChainsResults) in
+                        
+                        if appChainsResults != nil {
+                            
+                            // @appchainsResults - result of string values for chains for batch request, it's an array of dictionaries
+                            // each dictionary has following keys: "appChainID": appChainID string, "appChainValue": *String value
+                            for appChainResult in appChainsResults! {
+                                let appChainResultDict = appChainResult as! NSDictionary
+                                let appChainName = appChainResultDict.object(forKey: "appChainID")
+                                let appChainValue = appChainResultDict.object(forKey: "appChainValue")
+                                
+                                if appChainName != nil && appChainValue != nil {
+                                    
+                                    let appChainNameString = appChainName! as! String
+                                    
+                                    if appChainNameString.range(of: "Chain88") != nil {
+                                        self.handleVitaminDLabel(appChainValue as! NSString!)
+                                        
+                                    } else if appChainNameString.range(of: "Chain9") != nil {
+                                        self.handleMelanomaLabel(appChainValue as! NSString!)
+                                    }
+                                    
+                                } else {
+                                    self.kMainQueue.async {
+                                        self.stopActivityIndicator()
+                                        self.view.isUserInteractionEnabled = true
+                                        self.vitaminDInfo.isHidden = true
+                                        self.melanomaInfo.isHidden = true
+                                        self.showAlertWithMessage("Sorry, error from server, can't load genetic information.")
+                                    }
+                                }
+                            }
+                        } else {
+                            self.kMainQueue.async {
+                                self.stopActivityIndicator()
+                                self.view.isUserInteractionEnabled = true
+                                self.vitaminDInfo.isHidden = true
+                                self.melanomaInfo.isHidden = true
+                                self.showAlertWithMessage("Sorry, error from server, can't load genetic information.")
+                            }
+                        }
+                    })
+                }
+            } else {
+                self.vitaminDInfo.isHidden = true
+                self.melanomaInfo.isHidden = true
+                self.showAlertWithMessage("Corrupted user info, can't load genetic information.")
+            }
+        } else {
+            self.vitaminDInfo.isHidden = true
+            self.melanomaInfo.isHidden = true
+            self.showAlertWithMessage("Corrupted user info, can't load genetic information.")
+        }
+    }
+    
     
         
     
     // MARK: - SQTokenRefreshProtocolDelegate
-    func tokenIsRefreshed(updatedToken: SQToken) -> Void {
+    func tokenIsRefreshed(_ updatedToken: SQToken) -> Void {
         
     }
     
     
     
+    func handleVitaminDLabel(_ vitaminDValue: NSString?) -> Void {
+        kMainQueue.async {
+            self.stopActivityIndicator()
+            self.view.isUserInteractionEnabled = true
+            self.vitaminDInfo.isHidden = false
+            
+            if vitaminDValue != nil {
+                if vitaminDValue!.length > 0 {
+                    
+                    if (vitaminDValue! as String).lowercased().range(of: "false") != nil {
+                        self.vitaminDInfo.text = "There is no issue with vitamin D"
+                        
+                    } else if (vitaminDValue! as String).lowercased().range(of: "true") != nil {
+                        self.vitaminDInfo.text = "There is an issue with vitamin D"
+                        
+                    } else {
+                        self.vitaminDInfo.text = "Sorry, there is invalid vitamin D information"
+                    }
+                    
+                } else {
+                    self.vitaminDInfo.text = "Sorry, there is error from the server."
+                }
+            } else {
+                self.vitaminDInfo.text = "Sorry, there is error from the server."
+            }
+        }
+    }
+    
+    
+    
+    func handleMelanomaLabel(_ melanomaRiskValue: NSString?) -> Void {
+        kMainQueue.async {
+            self.stopActivityIndicator()
+            self.view.isUserInteractionEnabled = true
+            self.melanomaInfo.isHidden = false
+            
+            if melanomaRiskValue != nil {
+                if melanomaRiskValue!.length > 0 {
+                    
+                    self.melanomaInfo.text = NSString(format: "Melanoma issue level is: %@", melanomaRiskValue!.capitalized) as String
+                    
+                } else {
+                    self.melanomaInfo.text = "Sorry, there is error from the server."
+                }
+            } else {
+                self.melanomaInfo.text = "Sorry, there is error from the server."
+            }
+        }
+    }
+    
+    
     
     // MARK: - Activity indicator
-    func startActivityIndicatorWithTitle(title: String) -> Void {
-        dispatch_async(kMainQueue) { () -> Void in
+    func startActivityIndicatorWithTitle(_ title: String) -> Void {
+        kMainQueue.async { () -> Void in
             
             self.strLabel = UILabel(frame: CGRect(x: 30, y: 0, width: 90, height: 30))
             self.strLabel.text = title
-            self.strLabel.font = UIFont.systemFontOfSize(13)
-            self.strLabel.textColor = UIColor.grayColor()
+            self.strLabel.font = UIFont.systemFont(ofSize: 13)
+            self.strLabel.textColor = UIColor.gray
             
             let xPos: CGFloat = self.view.frame.midX - 60
             // let yPos: CGFloat = self.mainVC.view.frame.midY + 50
             self.messageFrame = UIView(frame: CGRect(x: xPos, y: 60, width: 120, height: 30))
             self.messageFrame.layer.cornerRadius = 15
-            self.messageFrame.backgroundColor = UIColor.clearColor()
+            self.messageFrame.backgroundColor = UIColor.clear
             
-            self.activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.Gray)
+            self.activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.gray)
             self.activityIndicator.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
             self.activityIndicator.startAnimating()
             
@@ -314,7 +415,7 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
     
     
     func stopActivityIndicator() -> Void {
-        dispatch_async(kMainQueue) { () -> Void in
+        kMainQueue.async { () -> Void in
             self.activityIndicator.stopAnimating()
             self.messageFrame.removeFromSuperview()
         }
@@ -322,19 +423,16 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocolDelegate
     
     
     // MARK: - Alert message
-    func showAlertWithMessage(message: NSString) -> Void {
-        let alert = UIAlertController(title: nil, message: message as String, preferredStyle: .Alert)
-        let close = UIAlertAction(title: "Close", style: .Default, handler: nil)
+    func showAlertWithMessage(_ message: NSString) -> Void {
+        let alert = UIAlertController(title: nil, message: message as String, preferredStyle: .alert)
+        let close = UIAlertAction(title: "Close", style: .default, handler: nil)
         alert.addAction(close)
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
     
     
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+    
     
     
 }

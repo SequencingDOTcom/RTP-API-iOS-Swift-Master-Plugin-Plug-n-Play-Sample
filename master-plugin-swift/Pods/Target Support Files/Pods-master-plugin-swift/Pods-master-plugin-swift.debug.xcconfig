@@ -1,9 +1,12 @@
+ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
 EMBEDDED_CONTENT_CONTAINS_SWIFT = YES
+FRAMEWORK_SEARCH_PATHS = $(inherited) "$PODS_CONFIGURATION_BUILD_DIR/sequencing-file-selector-api-swift" "${PODS_ROOT}/sequencing-app-chains-api-swift" "${PODS_ROOT}/sequencing-oauth-api-swift"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/sequencing-master-plugin-api-swift"
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/sequencing-app-chains-api-swift" "${PODS_ROOT}/Headers/Public/sequencing-master-plugin-api-swift" "${PODS_ROOT}/Headers/Public/sequencing-oauth-api-swift"
 LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/Frameworks' '@loader_path/Frameworks'
-OTHER_CFLAGS = $(inherited) -iquote "$CONFIGURATION_BUILD_DIR/sequencing_app_chains_api_swift.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/sequencing_file_selector_api_swift.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/sequencing_oauth_api_swift.framework/Headers" -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/sequencing-master-plugin-api-swift"
-OTHER_LDFLAGS = $(inherited) -framework "sequencing_app_chains_api_swift" -framework "sequencing_file_selector_api_swift" -framework "sequencing_oauth_api_swift"
+OTHER_CFLAGS = $(inherited) -iquote "$PODS_CONFIGURATION_BUILD_DIR/sequencing-file-selector-api-swift/sequencing_file_selector_api_swift.framework/Headers" -isystem "${PODS_ROOT}/Headers/Public" -isystem "${PODS_ROOT}/Headers/Public/sequencing-app-chains-api-swift" -isystem "${PODS_ROOT}/Headers/Public/sequencing-master-plugin-api-swift" -isystem "${PODS_ROOT}/Headers/Public/sequencing-oauth-api-swift"
+OTHER_LDFLAGS = $(inherited) -ObjC -framework "AppChainsLibrary" -framework "OAuth" -framework "sequencing_file_selector_api_swift"
 OTHER_SWIFT_FLAGS = $(inherited) "-D" "COCOAPODS"
-PODS_FRAMEWORK_BUILD_PATH = $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Pods-master-plugin-swift
+PODS_BUILD_DIR = $BUILD_DIR
+PODS_CONFIGURATION_BUILD_DIR = $PODS_BUILD_DIR/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
 PODS_ROOT = ${SRCROOT}/Pods

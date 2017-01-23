@@ -1,19 +1,21 @@
 PODS:
-  - sequencing-app-chains-api-swift (1.0.1)
-  - sequencing-file-selector-api-swift (1.0.1)
-  - sequencing-master-plugin-api-swift (1.0.1):
-    - sequencing-app-chains-api-swift (~> 1.0.1)
-    - sequencing-file-selector-api-swift (~> 1.0.1)
-    - sequencing-oauth-api-swift (~> 1.0.3)
-  - sequencing-oauth-api-swift (1.0.3)
+  - sequencing-app-chains-api-swift (2.1.0)
+  - sequencing-file-selector-api-swift (1.1.1)
+  - sequencing-master-plugin-api-swift (1.1.1):
+    - sequencing-app-chains-api-swift (~> 2.1.0)
+    - sequencing-file-selector-api-swift (~> 1.1.1)
+    - sequencing-oauth-api-swift (~> 2.0.0)
+  - sequencing-oauth-api-swift (2.0.0)
 
 DEPENDENCIES:
-  - sequencing-master-plugin-api-swift (~> 1.0.1)
+  - sequencing-master-plugin-api-swift (~> 1.1.1)
 
 SPEC CHECKSUMS:
-  sequencing-app-chains-api-swift: cb2c22adf95c3fdf39224684466647de8ceadaf1
-  sequencing-file-selector-api-swift: 06fa0ab75de607a8cb3b0e55c944a09d0a00e953
-  sequencing-master-plugin-api-swift: 36a66a59239bbe25b746be971bd98dda9dc9c6aa
-  sequencing-oauth-api-swift: 01f6368aba31cc4758dadcf904085b5b451855dc
+  sequencing-app-chains-api-swift: 07b77f7237ebbddc81756f1f9e8e1b771923520f
+  sequencing-file-selector-api-swift: 2a1367ba259cb5835a4b2e9119ddae6241669094
+  sequencing-master-plugin-api-swift: 1ea3609fedb4953549179d50fa60f944f678e8c9
+  sequencing-oauth-api-swift: 5b0528b85d96d5f8c09032bb1be4b193fb8b71e7
 
-COCOAPODS: 0.39.0
+PODFILE CHECKSUM: 0c919fc1caa8e9601edc7ec935c5bc4a1dd1a553
+
+COCOAPODS: 1.1.1

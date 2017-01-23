@@ -1,17 +1,13 @@
 //
 //  LoginViewController.swift
-//  Copyright © 2016 Sequencing.com. All rights reserved.
+//  Copyright © 2017 Sequencing.com. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-// ADD THIS POD IMPORT
-import sequencing_oauth_api_swift
 
-
-class LoginViewController: UIViewController, SQAuthorizationProtocolDelegate {
-    
+class LoginViewController: UIViewController, SQAuthorizationProtocol {
     
     // THESE ARE THE APPLICATION PARAMETERS
     // SPECIFY THEM HERE
@@ -20,8 +16,10 @@ class LoginViewController: UIViewController, SQAuthorizationProtocolDelegate {
     let REDIRECT_URI: String    = "authapp://Default/Authcallback"
     let SCOPE: String           = "demo,external"
     
-    let kMainQueue = dispatch_get_main_queue()
+    let kMainQueue = DispatchQueue.main
     let SELECT_FILES_CONTROLLER_SEGUE_ID = "SELECT_FILES"
+    
+    let oauthApiHelper = SQOAuth()
     
     
     
@@ -31,73 +29,72 @@ class LoginViewController: UIViewController, SQAuthorizationProtocolDelegate {
         
         
         // set up loginButton
-        let loginButton = UIButton(type: UIButtonType.Custom)
-        loginButton.setImage(UIImage(named: "button_signin_white_gradation"), forState: UIControlState.Normal)
-        loginButton.addTarget(self, action: #selector(self.loginButtonPressed), forControlEvents: UIControlEvents.TouchUpInside)
+        let loginButton = UIButton(type: UIButtonType.custom)
+        loginButton.setImage(UIImage(named: "button_signin_white_gradation"), for: UIControlState())
+        loginButton.addTarget(self, action: #selector(self.loginButtonPressed), for: UIControlEvents.touchUpInside)
         loginButton.sizeToFit()
         loginButton.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(loginButton)
-        self.view.bringSubviewToFront(loginButton)
+        self.view.bringSubview(toFront: loginButton)
         
         // adding constraints for loginButton
         let xCenter = NSLayoutConstraint.init(item: loginButton,
-                                              attribute: NSLayoutAttribute.CenterX,
-                                              relatedBy: NSLayoutRelation.Equal,
+                                              attribute: NSLayoutAttribute.centerX,
+                                              relatedBy: NSLayoutRelation.equal,
                                               toItem: self.view,
-                                              attribute: NSLayoutAttribute.CenterX,
+                                              attribute: NSLayoutAttribute.centerX,
                                               multiplier: 1,
                                               constant: 0)
         let yCenter = NSLayoutConstraint.init(item: loginButton,
-                                              attribute: NSLayoutAttribute.CenterY,
-                                              relatedBy: NSLayoutRelation.Equal,
+                                              attribute: NSLayoutAttribute.centerY,
+                                              relatedBy: NSLayoutRelation.equal,
                                               toItem: self.view,
-                                              attribute: NSLayoutAttribute.CenterY,
+                                              attribute: NSLayoutAttribute.centerY,
                                               multiplier: 1,
                                               constant: 0)
         self.view.addConstraint(xCenter)
         self.view.addConstraint(yCenter)
         
         // REGISTER APPLICATION PARAMETERS
-        SQOAuth.instance.registrateApplicationParametersClientID(CLIENT_ID,
-                                                                 ClientSecret: CLIENT_SECRET,
-                                                                 RedirectUri: REDIRECT_URI,
-                                                                 Scope: SCOPE)
-        
+        self.oauthApiHelper.registrateApplicationParametersCliendID(CLIENT_ID,
+                                                                 clientSecret:CLIENT_SECRET,
+                                                                 redirectUri:REDIRECT_URI,
+                                                                 scope:SCOPE)
         // subscribe self as delegate to SQAuthorizationProtocol
-        SQOAuth.instance.authorizationDelegate = self
+        self.oauthApiHelper.authorizationDelegate = self
     }
     
     
     
     // MARK: - Actions
     func loginButtonPressed() {
-        self.view.userInteractionEnabled = false
-        SQOAuth.instance.authorizeUser()
+        self.view.isUserInteractionEnabled = false
+        self.oauthApiHelper.authorizeUser()
     }
         
     
     
     // MARK: - SQAuthorizationProtocolDelegate
-    func userIsSuccessfullyAuthorized(token: SQToken) -> Void {
-        dispatch_async(self.kMainQueue, { () -> Void in
+    func userIsSuccessfullyAuthorized(_ token: SQToken) -> Void {
+        self.kMainQueue.async(execute: { () -> Void in
             print("user Is Successfully Authorized")
-            self.view.userInteractionEnabled = true
-            self.performSegueWithIdentifier(self.SELECT_FILES_CONTROLLER_SEGUE_ID, sender: token)
+            self.view.isUserInteractionEnabled = true
+            self.performSegue(withIdentifier: self.SELECT_FILES_CONTROLLER_SEGUE_ID, sender: token)
         })
     }
     
     
     func userIsNotAuthorized() -> Void {
-        dispatch_async(kMainQueue) {
+        self.kMainQueue.async {
             print("user is not authorized")
-            self.view.userInteractionEnabled = true
+            self.view.isUserInteractionEnabled = true
             self.showAlertWithMessage("Server error\nCan't authorize user")
         }
     }
     
     func userDidCancelAuthorization() -> Void {
-        dispatch_async(kMainQueue) {
-            self.view.userInteractionEnabled = true
+        self.kMainQueue.async {
+            self.view.isUserInteractionEnabled = true
             print("user Did Cancel Authorization")
         }
     }
@@ -105,10 +102,10 @@ class LoginViewController: UIViewController, SQAuthorizationProtocolDelegate {
     
     
     // MARK: - Navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.destinationViewController.isKindOfClass(SelectFileViewController) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.destination.isKind(of: SelectFileViewController.self) {
             if sender != nil {
-                let destinationVC = segue.destinationViewController as! SelectFileViewController
+                let destinationVC = segue.destination as! SelectFileViewController
                 destinationVC.token = sender as! SQToken?
             }
         }
@@ -117,11 +114,11 @@ class LoginViewController: UIViewController, SQAuthorizationProtocolDelegate {
     
     
     // MARK: - Allert Message
-    func showAlertWithMessage(message: NSString) -> Void {
-        let alert = UIAlertController(title: nil, message: message as String, preferredStyle: .Alert)
-        let closeAction = UIAlertAction(title: "Close", style: .Default, handler: nil)
+    func showAlertWithMessage(_ message: NSString) -> Void {
+        let alert = UIAlertController(title: nil, message: message as String, preferredStyle: .alert)
+        let closeAction = UIAlertAction(title: "Close", style: .default, handler: nil)
         alert.addAction(closeAction)
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
     
     

@@ -9,17 +9,7 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>sequencing-app-chains-api-swift.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>sequencing-file-selector-api-swift.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>sequencing-oauth-api-swift.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -27,22 +17,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>3094B5614B56CD7D04101811DAE92183</key>
+		<key>6910EE47DCA19BC3A5B0CB615BC94AF9</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>8F1ED8916A1AFDC6F3F687678F1DA1EF</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>A5DBCD6F795BDD9355076F1068B70870</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>E380AD931D73904DC34CE3D683624B75</key>
+		<key>AD77BA26040856F6542B5A3E667140CD</key>
 		<dict>
 			<key>primary</key>
 			<true/>

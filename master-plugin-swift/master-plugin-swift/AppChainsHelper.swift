@@ -1,103 +1,157 @@
 //
 //  AppChainsHelper.swift
-//  Copyright © 2016 Plexteq. All rights reserved.
+//  Copyright © 2017 Sequencing.com. All rights reserved.
 //
 
 import Foundation
-import sequencing_app_chains_api_swift
 
 
 class AppChainsHelper: NSObject {
     
     
-    // Genetic chains
-    class func requestForChain88BasedOnFileID(fileID: String, accessToken: String, completion: (vitaminDValue: NSString?) -> Void) -> Void {
+    // Genetic chains protocol v2
+    func requestForChain88BasedOnFileID(fileID: String, accessToken: String, completion: @escaping (_ vitaminDValue: NSString?) -> Void) -> Void {
         print("starting request for chains88: vitaminDValue")
         
-        let appChainsManager = AppChains.init(token: accessToken as String, chainsHostname: "api.sequencing.com")
-        let returnValue: ReturnValue<Report> = appChainsManager.getReport("StartApp", applicationMethodName: "Chain88", datasourceId: fileID as String)
-        
-        switch returnValue {
+        if let appChainsManager = AppChains.init(token: accessToken as String, withHostName: "api.sequencing.com") {
             
-            case .Success(let value):
-                let report: Report = value
-                let vitaminDKey = "result"
-                var vitaminDValue = "" as NSString
+            appChainsManager.getReportWithApplicationMethodName("Chain88", withDatasourceId: fileID, withSuccessBlock: { (result) in
                 
-                for result: Result in report.results {
-                    let resultValue: ResultValue = result.value
+                let resultReport: Report = result as Report!
+                completion(self.parseReportForChain88(resultReport: resultReport))
+                
+            }) { (error) in
+                print("[appChain88 Error] vitaminD value is absent.")
+                completion(nil)
+            }
+        }
+    }
+    
+    
+    
+    func requestForChain9BasedOnFileID(fileID: String, accessToken: String, completion: @escaping (_ melanomaRiskValue: NSString?) -> Void) -> Void {
+        print("starting request for chains9: melanomaRiskValue")
+        
+        if let appChainsManager = AppChains.init(token: accessToken as String, withHostName: "api.sequencing.com") {
+            
+            appChainsManager.getReportWithApplicationMethodName("Chain9", withDatasourceId: fileID, withSuccessBlock: { (result) in
+                let resultReport: Report = result as Report!;
+                completion(self.parseReportForChain9(resultReport: resultReport))
+                
+            }) { (error) in
+                print("[appChain9 Error] melanoma info is absent.")
+                completion(nil)
+            }
+        }
+    }
+    
+    
+    
+    func batchRequestForChain88AndChain9BasedOnFileID(fileID: String, accessToken: String, completion: @escaping (_ appchainsResults: NSArray?) -> Void) -> Void {
+        print("starting batch request for chains88 (vitaminDValue) and chains9 (melanomaRiskValue)")
+        
+        if let appChainsManager = AppChains.init(token: accessToken as String, withHostName: "api.sequencing.com") {
+            
+            let appChainsForRequest: NSArray = [["Chain88", fileID],
+                                                ["Chain9", fileID]]
+            
+            appChainsManager.getBatchReport(withApplicationMethodName: appChainsForRequest as [AnyObject], withSuccessBlock: { (resultsArray) in
+                
+                let reportResultsArray = resultsArray! as NSArray
+                let appChainsResultsArray = NSMutableArray()
+                
+                for appChainReport in reportResultsArray {
+                    let appChainReportDict = appChainReport as! NSDictionary
+                    let resultReport: Report = appChainReportDict.object(forKey: "report") as! Report;
+                    let appChainID: NSString = appChainReportDict.object(forKey: "appChainID") as! NSString;
+                    var appChainValue: NSString = ""
                     
-                    if resultValue.type == ResultType.TEXT {
-                        print(result.name + " = " + (resultValue as! TextResultValue).data)
+                    if appChainID.isEqual(to: "Chain88") {
+                        appChainValue = self.parseReportForChain88(resultReport: resultReport)
+                        print(appChainValue)
                         
-                        if result.name.lowercaseString == vitaminDKey {
-                            let vitaminDRawValue = (resultValue as! TextResultValue).data
-                            
-                            if (vitaminDRawValue as NSString).length > 0 {
-                                if vitaminDRawValue.lowercaseString.rangeOfString("no") != nil {
+                    } else if appChainID.isEqual(to: "Chain9") {
+                        appChainValue = self.parseReportForChain9(resultReport: resultReport)
+                        print(appChainValue)
+                    }
+                    
+                    let reportItem: NSDictionary = ["appChainID": appChainID,
+                                                    "appChainValue": appChainValue]
+                    appChainsResultsArray.add(_ : reportItem)
+                }
+                completion(appChainsResultsArray)
+                
+            }, withFailureBlock: { (error) in
+                print("batch request error.")
+                completion(nil)
+            })
+        }
+    }
+    
+    
+    
+    func parseReportForChain88(resultReport: Report) -> NSString {
+        var vitaminDValue = "" as NSString
+        
+        if resultReport.isSucceeded() {
+            let vitaminDKey = "result"
+            
+            if resultReport.getResults() != nil {
+                for item in resultReport.getResults() {
+                    
+                    let resultObj = item as! Result
+                    let resultValue: ResultValue = resultObj.getValue()
+                    
+                    if resultValue.getType() == ResultType.text {
+                        print(resultObj.getName() + " = " + (resultValue as! TextResultValue).getData())
+                        
+                        if resultObj.getName().lowercased() == vitaminDKey {
+                            if let vitaminDRawValue = (resultValue as! TextResultValue).getData() {
+                                
+                                if vitaminDRawValue.lowercased().range(of: "no") != nil {
                                     vitaminDValue = "False"
+                                    
                                 } else {
                                     vitaminDValue = "True"
                                 }
-                                
                             }
                         }
                     }
                 }
-                
-                if vitaminDValue.length > 0 {
-                    completion(vitaminDValue: vitaminDValue)
-                } else {
-                    print("[appChain88 Error] vitaminD value is absent")
-                    completion(vitaminDValue: nil)
-                }
-            
-            case .Failure(let error):
-                print("[appChain88 Error] vitaminD value is absent. " + error)
-                completion(vitaminDValue: nil)
+            }
         }
+        return vitaminDValue
     }
     
     
     
-    class func requestForChain9BasedOnFileID(fileID: String, accessToken: String, completion: (melanomaRiskValue: NSString?) -> Void) -> Void {
-        print("starting request for chains9: melanomaRiskValue")
+    func parseReportForChain9(resultReport: Report) -> NSString {
+        var riskValue = "" as NSString
         
-        let appChainsManager = AppChains.init(token: accessToken as String, chainsHostname: "api.sequencing.com")
-        let returnValue = appChainsManager.getReport("StartApp", applicationMethodName: "Chain9", datasourceId: fileID as String)
-        
-        switch returnValue {
-            
-        case .Success(let value):
-            let report: Report = value
+        if resultReport.isSucceeded() {
             let riskKey = "riskdescription"
-            var riskValue = "" as NSString
             
-            for result: Result in report.results {
-                let resultValue: ResultValue = result.value
-                
-                if resultValue.type == ResultType.TEXT {
-                    print(result.name + " = " + (resultValue as! TextResultValue).data)
+            if resultReport.getResults() != nil {
+                for item in resultReport.getResults() {
                     
-                    if result.name.lowercaseString == riskKey {
-                        riskValue = (resultValue as! TextResultValue).data
+                    let resultObj = item as! Result
+                    let resultValue: ResultValue = resultObj.getValue()
+                    
+                    if resultValue.getType() == ResultType.text {
+                        print(resultObj.getName() + " = " + (resultValue as! TextResultValue).getData())
+                        
+                        if resultObj.getName().lowercased() == riskKey {
+                            
+                            if let riskRawValue = (resultValue as! TextResultValue).getData() {
+                                riskValue = riskRawValue as NSString
+                            }
+                        }
                     }
                 }
             }
-            
-            if riskValue.length > 0 {
-                completion(melanomaRiskValue: riskValue)
-            } else {
-                print("[appChain9 Error] melanoma info is absent")
-                completion(melanomaRiskValue: nil)
-            }
-            
-        case .Failure(let error):
-            print("[appChain9 Error] melanoma info is absent. " + error)
-            completion(melanomaRiskValue: nil)
         }
+        return riskValue
     }
-    
     
 
 }
