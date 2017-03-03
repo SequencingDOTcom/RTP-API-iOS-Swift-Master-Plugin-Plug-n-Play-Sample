@@ -35,8 +35,8 @@ typedef void(^ReportsArray)(NSArray *reportResultsArray);
  * Get report method for one app chain
  * @param applicationMethodName - report/application specific identifier (i.e. MelanomaDsAppv)
  * @param datasourceId - resource with data to use for report generation
- * @return success success block with report
- * @return failure failure block with error
+ * return success success block with report
+ * return failure failure block with error
  */
 - (void)getReportWithApplicationMethodName:(NSString *)applicationMethodName
                           withDatasourceId:(NSString *)datasourceId

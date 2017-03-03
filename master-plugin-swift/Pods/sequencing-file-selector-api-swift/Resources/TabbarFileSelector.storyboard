@@ -120,14 +120,14 @@ Do you want this app to analyze genetic data from one of your files or a sample 
                     </view>
                     <navigationItem key="navigationItem" id="7wl-It-ob7"/>
                     <connections>
-                        <outlet property="grayView" destination="0bo-cU-pff" id="dRh-1e-5SE"/>
-                        <outlet property="introLabel" destination="gGA-AX-y9C" id="ppr-PX-Rhk"/>
-                        <outlet property="myFilesButton" destination="wzn-kK-imI" id="auQ-0D-2Kx"/>
-                        <outlet property="myFilesIcon" destination="Fz2-fr-pgh" id="ofw-Fp-plM"/>
-                        <outlet property="myFilesLabel" destination="eG7-Ej-XQr" id="lOA-fL-tl2"/>
-                        <outlet property="sampleFilesButton" destination="RrF-Ln-DHv" id="i6y-WK-Ywh"/>
-                        <outlet property="sampleFilesIcon" destination="JU0-wb-t9Z" id="DlJ-gP-4Tq"/>
-                        <outlet property="sampleFilesLabel" destination="Jxd-M8-UoU" id="sQA-E0-voL"/>
+                        <outlet property="grayView" destination="0bo-cU-pff" id="Pfr-ss-b4k"/>
+                        <outlet property="introLabel" destination="gGA-AX-y9C" id="Tkp-Ky-fcD"/>
+                        <outlet property="myFilesButton" destination="wzn-kK-imI" id="55h-yV-ro2"/>
+                        <outlet property="myFilesIcon" destination="Fz2-fr-pgh" id="RYG-hh-96I"/>
+                        <outlet property="myFilesLabel" destination="eG7-Ej-XQr" id="0vv-G6-mIz"/>
+                        <outlet property="sampleFilesButton" destination="RrF-Ln-DHv" id="CSM-Wn-C32"/>
+                        <outlet property="sampleFilesIcon" destination="JU0-wb-t9Z" id="3JN-gE-kvZ"/>
+                        <outlet property="sampleFilesLabel" destination="Jxd-M8-UoU" id="ZQI-hS-5e1"/>
                         <segue destination="OYv-Jf-pVB" kind="presentation" identifier="SHOW_FILES_SEGUE_ID" modalTransitionStyle="crossDissolve" id="YMI-Nu-SlL"/>
                     </connections>
                 </viewController>
@@ -208,12 +208,12 @@ Do you want this app to analyze genetic data from one of your files or a sample 
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="cellLabel" destination="Dao-ao-uaP" id="f4J-hz-oew"/>
+                                            <outlet property="cellLabel" destination="Dao-ao-uaP" id="qps-ZF-mjc"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QTs-WC-930" userLabel="extendedNavBar" customClass="SQFilesExtendedNavBarView" customModule="sequencing_file_selector_api_swift">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QTs-WC-930" userLabel="extendedNavBar" customClass="SQFilesExtendedNavBarView" customModule="oauthdemoapp_swift" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="64" width="375" height="45"/>
                                 <color key="backgroundColor" red="0.96862745100000003" green="0.96862745100000003" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -234,8 +234,8 @@ Do you want this app to analyze genetic data from one of your files or a sample 
                     </view>
                     <navigationItem key="navigationItem" id="beD-gW-m64"/>
                     <connections>
-                        <outlet property="extendedNavBarView" destination="QTs-WC-930" id="drf-wf-a6D"/>
-                        <outlet property="tableView" destination="otS-II-8Kw" id="n0o-BK-Ts0"/>
+                        <outlet property="extendedNavBarView" destination="QTs-WC-930" id="zED-6s-Vk5"/>
+                        <outlet property="tableView" destination="otS-II-8Kw" id="aDR-Rm-qaX"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zDz-Sv-HdH" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -279,12 +279,12 @@ Do you want this app to analyze genetic data from one of your files or a sample 
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="cellLabel" destination="PUF-uv-KG1" id="r5z-Tk-rAz"/>
+                                            <outlet property="cellLabel" destination="PUF-uv-KG1" id="JaN-pf-ZEu"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JUM-I7-HQf" userLabel="extendedNavBar" customClass="SQFilesExtendedNavBarView" customModule="sequencing_file_selector_api_swift">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JUM-I7-HQf" userLabel="extendedNavBar" customClass="SQFilesExtendedNavBarView" customModule="oauthdemoapp_swift" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="64" width="375" height="45"/>
                                 <color key="backgroundColor" red="0.96862745100000003" green="0.96862745100000003" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -305,8 +305,8 @@ Do you want this app to analyze genetic data from one of your files or a sample 
                     </view>
                     <navigationItem key="navigationItem" id="dri-a2-XV3"/>
                     <connections>
-                        <outlet property="extendedNavBarView" destination="JUM-I7-HQf" id="1uQ-AA-ZiF"/>
-                        <outlet property="tableView" destination="7nj-0j-fLh" id="qdf-h0-RYK"/>
+                        <outlet property="extendedNavBarView" destination="JUM-I7-HQf" id="sh4-Yr-zcR"/>
+                        <outlet property="tableView" destination="7nj-0j-fLh" id="Lhy-Qq-Ihh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V9m-Pr-slq" userLabel="First Responder" sceneMemberID="firstResponder"/>

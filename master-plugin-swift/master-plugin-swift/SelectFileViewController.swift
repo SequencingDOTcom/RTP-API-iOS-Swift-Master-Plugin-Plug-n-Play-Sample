@@ -11,7 +11,7 @@ import sequencing_file_selector_api_swift
 
     
 
-class SelectFileViewController: UIViewController, SQTokenRefreshProtocol, SQFileSelectorProtocol {
+class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     
     
     let kMainQueue = DispatchQueue.main
@@ -55,9 +55,6 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocol, SQFile
         
         self.title = "Using genetic file"
         
-        // subscribe self as delegate to SQTokenRefreshProtocol
-        self.oauthApiHelper.refreshTokenDelegate = self
-        
         // subscribe self as delegate to SQFileSelectorProtocol
         self.filesApiHelper.selectedFileDelegate = self
         self.filesApiHelper.closeButton = true
@@ -88,7 +85,6 @@ class SelectFileViewController: UIViewController, SQTokenRefreshProtocol, SQFile
     
     
     deinit {
-        self.oauthApiHelper.refreshTokenDelegate = nil
         self.filesApiHelper.selectedFileDelegate = nil
     }
     

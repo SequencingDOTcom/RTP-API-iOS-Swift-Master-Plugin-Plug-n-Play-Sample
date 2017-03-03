@@ -70,7 +70,7 @@ Thus you need 3 modules to be installed and set up: ```OAuth```, ```File Selecto
 * specify following parameters in Podfile: 
 
 	```
-	pod 'sequencing-app-chains-api-swift', '~> 2.1.0'
+	pod 'sequencing-app-chains-api-swift', '~> 2.1.1'
 	```		
 		
 * install the dependency in your project: 
