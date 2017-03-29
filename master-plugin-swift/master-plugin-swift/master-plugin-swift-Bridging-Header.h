@@ -5,4 +5,6 @@
 
 
 #import <OAuth/SQOAuthFramework.h>
+#import <FileSelector/SQFileSelectorFramework.h>
 #import <AppChainsLibrary/AppChains.h>
+

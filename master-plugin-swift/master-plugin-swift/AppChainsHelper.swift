@@ -8,20 +8,26 @@ import Foundation
 
 class AppChainsHelper: NSObject {
     
-    
     // Genetic chains protocol v2
-    func requestForChain88BasedOnFileID(fileID: String, accessToken: String, completion: @escaping (_ vitaminDValue: NSString?) -> Void) -> Void {
+    func requestForChain88BasedOnFileID(fileID: String, tokenProvider: SQOAuth, completion: @escaping (_ vitaminDValue: NSString?) -> Void) -> Void {
         print("starting request for chains88: vitaminDValue")
         
-        if let appChainsManager = AppChains.init(token: accessToken as String, withHostName: "api.sequencing.com") {
-            
-            appChainsManager.getReportWithApplicationMethodName("Chain88", withDatasourceId: fileID, withSuccessBlock: { (result) in
+        tokenProvider.token { (token, accessToken) in
+            if accessToken != nil {
                 
-                let resultReport: Report = result as Report!
-                completion(self.parseReportForChain88(resultReport: resultReport))
-                
-            }) { (error) in
-                print("[appChain88 Error] vitaminD value is absent.")
+                if let appChainsManager = AppChains.init(token: accessToken!, withHostName: "api.sequencing.com") {
+                    
+                    appChainsManager.getReportWithApplicationMethodName("Chain88", withDatasourceId: fileID, withSuccessBlock: { (result) in
+                        
+                        let resultReport: Report = result as Report!
+                        completion(self.parseReportForChain88(resultReport: resultReport))
+                        
+                    }) { (error) in
+                        print("[appChain88 Error] vitaminD value is absent.")
+                        completion(nil)
+                    }
+                }
+            } else {
                 completion(nil)
             }
         }
@@ -29,17 +35,24 @@ class AppChainsHelper: NSObject {
     
     
     
-    func requestForChain9BasedOnFileID(fileID: String, accessToken: String, completion: @escaping (_ melanomaRiskValue: NSString?) -> Void) -> Void {
+    func requestForChain9BasedOnFileID(fileID: String, tokenProvider: SQOAuth, completion: @escaping (_ melanomaRiskValue: NSString?) -> Void) -> Void {
         print("starting request for chains9: melanomaRiskValue")
         
-        if let appChainsManager = AppChains.init(token: accessToken as String, withHostName: "api.sequencing.com") {
-            
-            appChainsManager.getReportWithApplicationMethodName("Chain9", withDatasourceId: fileID, withSuccessBlock: { (result) in
-                let resultReport: Report = result as Report!;
-                completion(self.parseReportForChain9(resultReport: resultReport))
+        tokenProvider.token { (token, accessToken) in
+            if accessToken != nil {
                 
-            }) { (error) in
-                print("[appChain9 Error] melanoma info is absent.")
+                if let appChainsManager = AppChains.init(token: accessToken!, withHostName: "api.sequencing.com") {
+                    
+                    appChainsManager.getReportWithApplicationMethodName("Chain9", withDatasourceId: fileID, withSuccessBlock: { (result) in
+                        let resultReport: Report = result as Report!;
+                        completion(self.parseReportForChain9(resultReport: resultReport))
+                        
+                    }) { (error) in
+                        print("[appChain9 Error] melanoma info is absent.")
+                        completion(nil)
+                    }
+                }
+            } else {
                 completion(nil)
             }
         }
@@ -47,44 +60,51 @@ class AppChainsHelper: NSObject {
     
     
     
-    func batchRequestForChain88AndChain9BasedOnFileID(fileID: String, accessToken: String, completion: @escaping (_ appchainsResults: NSArray?) -> Void) -> Void {
+    func batchRequestForChain88AndChain9BasedOnFileID(fileID: String, tokenProvider: SQOAuth, completion: @escaping (_ appchainsResults: NSArray?) -> Void) -> Void {
         print("starting batch request for chains88 (vitaminDValue) and chains9 (melanomaRiskValue)")
         
-        if let appChainsManager = AppChains.init(token: accessToken as String, withHostName: "api.sequencing.com") {
-            
-            let appChainsForRequest: NSArray = [["Chain88", fileID],
-                                                ["Chain9", fileID]]
-            
-            appChainsManager.getBatchReport(withApplicationMethodName: appChainsForRequest as [AnyObject], withSuccessBlock: { (resultsArray) in
+        tokenProvider.token { (token, accessToken) in
+            if accessToken != nil {
                 
-                let reportResultsArray = resultsArray! as NSArray
-                let appChainsResultsArray = NSMutableArray()
-                
-                for appChainReport in reportResultsArray {
-                    let appChainReportDict = appChainReport as! NSDictionary
-                    let resultReport: Report = appChainReportDict.object(forKey: "report") as! Report;
-                    let appChainID: NSString = appChainReportDict.object(forKey: "appChainID") as! NSString;
-                    var appChainValue: NSString = ""
+                if let appChainsManager = AppChains.init(token: accessToken!, withHostName: "api.sequencing.com") {
                     
-                    if appChainID.isEqual(to: "Chain88") {
-                        appChainValue = self.parseReportForChain88(resultReport: resultReport)
-                        print(appChainValue)
+                    let appChainsForRequest: NSArray = [["Chain88", fileID],
+                                                        ["Chain9", fileID]]
+                    
+                    appChainsManager.getBatchReport(withApplicationMethodName: appChainsForRequest as [AnyObject], withSuccessBlock: { (resultsArray) in
                         
-                    } else if appChainID.isEqual(to: "Chain9") {
-                        appChainValue = self.parseReportForChain9(resultReport: resultReport)
-                        print(appChainValue)
-                    }
-                    
-                    let reportItem: NSDictionary = ["appChainID": appChainID,
-                                                    "appChainValue": appChainValue]
-                    appChainsResultsArray.add(_ : reportItem)
+                        let reportResultsArray = resultsArray! as NSArray
+                        let appChainsResultsArray = NSMutableArray()
+                        
+                        for appChainReport in reportResultsArray {
+                            let appChainReportDict = appChainReport as! NSDictionary
+                            let resultReport: Report = appChainReportDict.object(forKey: "report") as! Report;
+                            let appChainID: NSString = appChainReportDict.object(forKey: "appChainID") as! NSString;
+                            var appChainValue: NSString = ""
+                            
+                            if appChainID.isEqual(to: "Chain88") {
+                                appChainValue = self.parseReportForChain88(resultReport: resultReport)
+                                print(appChainValue)
+                                
+                            } else if appChainID.isEqual(to: "Chain9") {
+                                appChainValue = self.parseReportForChain9(resultReport: resultReport)
+                                print(appChainValue)
+                            }
+                            
+                            let reportItem: NSDictionary = ["appChainID": appChainID,
+                                                            "appChainValue": appChainValue]
+                            appChainsResultsArray.add(_ : reportItem)
+                        }
+                        completion(appChainsResultsArray)
+                        
+                    }, withFailureBlock: { (error) in
+                        print("batch request error.")
+                        completion(nil)
+                    })
                 }
-                completion(appChainsResultsArray)
-                
-            }, withFailureBlock: { (error) in
-                print("batch request error.")
+            } else {
                 completion(nil)
-            })
+            }
         }
     }
     

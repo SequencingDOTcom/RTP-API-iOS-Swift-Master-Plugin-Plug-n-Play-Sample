@@ -5,10 +5,13 @@
 
 #import <Foundation/Foundation.h>
 #import "SQOAuth.h"
+#import "SQConnectTo.h"
+#import "SQ3rdPartyImportAPI.h"
 #import "SQToken.h"
 #import "SQAuthorizationProtocol.h"
-#import "SQSignUpProtocol.h"
-#import "SQResetPasswordProtocol.h"
+#import "SQTokenAccessProtocol.h"
+#import "SQClientSecretAccessProtocol.h"
+
 
 @interface SQOAuthFramework : NSObject
 

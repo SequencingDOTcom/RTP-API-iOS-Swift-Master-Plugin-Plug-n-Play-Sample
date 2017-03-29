@@ -1,6 +1,0 @@
-framework module sequencing_file_selector_api_swift {
-  umbrella header "sequencing-file-selector-api-swift-umbrella.h"
-
-  export *
-  module * { export * }
-}

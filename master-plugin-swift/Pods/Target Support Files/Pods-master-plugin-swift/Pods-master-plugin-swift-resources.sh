@@ -74,10 +74,18 @@ EOM
   esac
 }
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_resource "sequencing-oauth-api-swift/Resources/Assets.xcassets"
+  install_resource "sequencing-file-selector-api-swift/Resources/SQPopoverInfoViewController.xib"
+  install_resource "sequencing-file-selector-api-swift/Resources/SQPopoverMyFilesViewController.xib"
+  install_resource "sequencing-file-selector-api-swift/Resources/TabbarFileSelector.storyboard"
+  install_resource "sequencing-file-selector-api-swift/Resources/Images.xcassets"
+  install_resource "sequencing-oauth-api-swift/Resources/AuthImages.xcassets"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_resource "sequencing-oauth-api-swift/Resources/Assets.xcassets"
+  install_resource "sequencing-file-selector-api-swift/Resources/SQPopoverInfoViewController.xib"
+  install_resource "sequencing-file-selector-api-swift/Resources/SQPopoverMyFilesViewController.xib"
+  install_resource "sequencing-file-selector-api-swift/Resources/TabbarFileSelector.storyboard"
+  install_resource "sequencing-file-selector-api-swift/Resources/Images.xcassets"
+  install_resource "sequencing-oauth-api-swift/Resources/AuthImages.xcassets"
 fi
 
 mkdir -p "${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"

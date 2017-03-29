@@ -6,20 +6,15 @@
 import UIKit
 import QuartzCore
 
-// ADD THIS POD IMPORT
-import sequencing_file_selector_api_swift
 
-    
 
 class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     
-    
     let kMainQueue = DispatchQueue.main
     let kBackgroundQueue = DispatchQueue.global()
-    let FILES_CONTROLLER_SEGUE_ID = "GET_FILES"
     
-    let oauthApiHelper = SQOAuth()
-    let filesApiHelper = SQFilesAPI.instance
+    let oauthApiHelper = SQOAuth.sharedInstance()
+    let filesApiHelper = SQFilesAPI.sharedInstance()
     let appChainsHelper = AppChainsHelper()
     
     // actiity indicator
@@ -27,7 +22,6 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     var strLabel = UILabel()
     var activityIndicator = UIActivityIndicatorView()
     
-    var token: SQToken?
     var selectedFile = NSDictionary()
     
     // UI items
@@ -52,12 +46,7 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     // MARK: - View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.title = "Using genetic file"
-        
-        // subscribe self as delegate to SQFileSelectorProtocol
-        self.filesApiHelper.selectedFileDelegate = self
-        self.filesApiHelper.closeButton = true
         
         // adjust buttons view
         buttonView.layer.cornerRadius = 5
@@ -85,7 +74,7 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     
     
     deinit {
-        self.filesApiHelper.selectedFileDelegate = nil
+        filesApiHelper?.delegate = nil
     }
     
     
@@ -104,58 +93,62 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
         vitaminDInfo.isHidden = true
         melanomaInfo.isHidden = true
         
-        if self.token != nil {
-            self.filesApiHelper.loadFilesWithToken(self.token!.accessToken as NSString, success: { (success) in
-                
-                self.kMainQueue.async {
-                    if success {
-                        self.stopActivityIndicator()
-                        self.view.isUserInteractionEnabled = true
-                        self.performSegue(withIdentifier: self.FILES_CONTROLLER_SEGUE_ID, sender: nil)
-                        
-                    } else {
-                        self.stopActivityIndicator()
-                        self.view.isUserInteractionEnabled = true
-                        self.showAlertWithMessage("Sorry, can't load genetic files")
-                    }
-                }
-            })
-        } else {
-            self.stopActivityIndicator()
-            self.showAlertWithMessage("Sorry, can't load genetic files > token is empty")
-        }
+        filesApiHelper!.showFiles(withTokenProvider: oauthApiHelper!,
+                                  showCloseButton: true,
+                                  previouslySelectedFileID: nil,
+                                  delegate: self)
+        
+        
+        
+        
     }
     
     
-    
-    
     // MARK: - SQFileSelectorProtocolDelegate
-    func handleFileSelected(_ file: NSDictionary) -> Void {
-        self.dismiss(animated: true, completion: nil)
-        print(file)
-        
-        if file.allKeys.count > 0 {
-            self.kMainQueue.async {
-                self.stopActivityIndicator()
-                self.view.isUserInteractionEnabled = true
-                self.selectedFile = file
-                let fileCategory = file.object(forKey: "FileCategory") as! String
-                var fileName: NSString
-                
-                if fileCategory.range(of: "Community") != nil {
-                    fileName = NSString(format: "%@ - %@", file.object(forKey: "FriendlyDesc1") as! NSString, file.object(forKey: "FriendlyDesc2") as! NSString)
-                } else {
-                    fileName = NSString(format: "%@", file.object(forKey: "Name") as! NSString)
+    func selectedGeneticFile(_ file: [AnyHashable : Any]!) {
+        if file != nil {
+            
+            let fileDict = file as NSDictionary!
+            
+            self.dismiss(animated: true, completion: nil)
+            print(file)
+            
+            if fileDict!.allKeys.count > 0 {
+                kMainQueue.async {
+                    self.stopActivityIndicator()
+                    self.view.isUserInteractionEnabled = true
+                    self.selectedFile = fileDict!
+                    let fileCategory = fileDict!.object(forKey: "FileCategory") as! String
+                    var fileName: NSString
+                    
+                    if fileCategory.range(of: "Community") != nil {
+                        fileName = NSString(format: "%@ - %@", fileDict!.object(forKey: "FriendlyDesc1") as! NSString, fileDict!.object(forKey: "FriendlyDesc2") as! NSString)
+                    } else {
+                        fileName = NSString(format: "%@", fileDict!.object(forKey: "Name") as! NSString)
+                    }
+                    
+                    self.selectedFileName.text = fileName as String
+                    
+                    self.selectedFileTagline.isHidden = false
+                    self.selectedFileName.isHidden = false
+                    self.getFileInfo.isHidden = false
+                    self.segmentedControlView.isHidden = false
+                    self.batchButtonView.isHidden = false
+                    self.batchButton.isHidden = false
                 }
-                
-                self.selectedFileName.text = fileName as String
-                
-                self.selectedFileTagline.isHidden = false
-                self.selectedFileName.isHidden = false
-                self.getFileInfo.isHidden = false
-                self.segmentedControlView.isHidden = false
-                self.batchButtonView.isHidden = false
-                self.batchButton.isHidden = false
+            } else {
+                kMainQueue.async {
+                    self.stopActivityIndicator()
+                    self.view.isUserInteractionEnabled = true
+                    self.showAlertWithMessage("Sorry, can't load genetic files")
+                    
+                    self.selectedFileTagline.isHidden = true
+                    self.selectedFileName.isHidden = true
+                    self.getFileInfo.isHidden = true
+                    self.segmentedControlView.isHidden = true
+                    self.batchButtonView.isHidden = true
+                    self.batchButton.isHidden = true
+                }
             }
         } else {
             kMainQueue.async {
@@ -174,9 +167,21 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     }
     
     
+    func errorWhileReceivingGeneticFiles(_ error: Error!) {
+        kMainQueue.async {
+            print("errorWhileReceivingGeneticFiles")
+            self.stopActivityIndicator()
+            self.view.isUserInteractionEnabled = true
+        }
+    }
+    
+    
     func closeButtonPressed() -> Void {
-        self.stopActivityIndicator()
-        self.dismiss(animated: true, completion: nil)
+        kMainQueue.async {
+            print("closeButtonPressed")
+            self.stopActivityIndicator()
+            self.view.isUserInteractionEnabled = true
+        }
     }
     
     
@@ -201,7 +206,7 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     
     
     func getVitaminDInfo() -> Void {
-        if selectedFile.allKeys.count > 0 && token != nil {
+        if selectedFile.allKeys.count > 0 {
             if let fileID = selectedFile.object(forKey: "Id") as! NSString? {
                 
                 self.vitaminDInfo.isHidden = true
@@ -209,7 +214,9 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
                 self.startActivityIndicatorWithTitle("Loading info...")
                 
                 self.kBackgroundQueue.async {
-                    self.appChainsHelper.requestForChain88BasedOnFileID(fileID: fileID as String, accessToken: self.token!.accessToken, completion: { (vitaminDValue) in
+                    self.appChainsHelper.requestForChain88BasedOnFileID(fileID: fileID as String,
+                                                                        tokenProvider: SQOAuth.sharedInstance(),
+                                                                        completion: { (vitaminDValue) in
                         
                         self.handleVitaminDLabel(vitaminDValue)
                     })
@@ -228,7 +235,7 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     
     
     func getMelanomaInfo() -> Void {
-        if selectedFile.allKeys.count > 0 && token != nil {
+        if selectedFile.allKeys.count > 0 {
             if let fileID = selectedFile.object(forKey: "Id") as! NSString? {
                 
                 self.melanomaInfo.isHidden = true
@@ -236,7 +243,9 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
                 self.startActivityIndicatorWithTitle("Loading info...")
                 
                 self.kBackgroundQueue.async {
-                    self.appChainsHelper.requestForChain9BasedOnFileID(fileID: fileID as String, accessToken: self.token!.accessToken, completion: { (melanomaRiskValue) in
+                    self.appChainsHelper.requestForChain9BasedOnFileID(fileID: fileID as String,
+                                                                       tokenProvider: SQOAuth.sharedInstance(),
+                                                                       completion: { (melanomaRiskValue) in
                         
                         self.handleMelanomaLabel(melanomaRiskValue)
                     })
@@ -258,7 +267,7 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     
     
     @IBAction func getVitaminDMelanomaInBatchRequest(_ sender: Any) {
-        if selectedFile.allKeys.count > 0 && token != nil {
+        if selectedFile.allKeys.count > 0 {
             if let fileID = selectedFile.object(forKey: "Id") as! NSString? {
                 
                 self.vitaminDInfo.isHidden = true
@@ -267,7 +276,9 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
                 self.startActivityIndicatorWithTitle("Loading info...")
                 
                 kBackgroundQueue.async {
-                    self.appChainsHelper.batchRequestForChain88AndChain9BasedOnFileID(fileID: fileID as String, accessToken: self.token!.accessToken, completion: { (appChainsResults) in
+                    self.appChainsHelper.batchRequestForChain88AndChain9BasedOnFileID(fileID: fileID as String,
+                                                                                      tokenProvider: SQOAuth.sharedInstance(),
+                                                                                      completion: { (appChainsResults) in
                         
                         if appChainsResults != nil {
                             

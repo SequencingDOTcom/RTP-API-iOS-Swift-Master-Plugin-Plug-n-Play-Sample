@@ -73,8 +73,7 @@ Please follow this guide to install File Selector module in your existed or new 
 * specify following parameters in Podfile: 
 
 	```
-	pod 'sequencing-oauth-api-swift', '~> 2.1.0'
-	pod 'sequencing-file-selector-api-swift', '~> 1.1.3'
+	pod 'sequencing-file-selector-api-swift', '~> 2.0.1'
 	```		
 		
 * install the dependency in your project: 

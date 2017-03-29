@@ -19,7 +19,7 @@ class LoginViewController: UIViewController, SQAuthorizationProtocol {
     let kMainQueue = DispatchQueue.main
     let SELECT_FILES_CONTROLLER_SEGUE_ID = "SELECT_FILES"
     
-    let oauthApiHelper = SQOAuth()
+    let oauthApiHelper = SQOAuth.sharedInstance()
     
     
     
@@ -30,7 +30,7 @@ class LoginViewController: UIViewController, SQAuthorizationProtocol {
         
         // set up loginButton
         let loginButton = UIButton(type: UIButtonType.custom)
-        loginButton.setImage(UIImage(named: "button_signin_white_gradation"), for: UIControlState())
+        loginButton.setImage(UIImage(named: "button_signin_black"), for: UIControlState())
         loginButton.addTarget(self, action: #selector(self.loginButtonPressed), for: UIControlEvents.touchUpInside)
         loginButton.sizeToFit()
         loginButton.translatesAutoresizingMaskIntoConstraints = false
@@ -56,12 +56,12 @@ class LoginViewController: UIViewController, SQAuthorizationProtocol {
         self.view.addConstraint(yCenter)
         
         // REGISTER APPLICATION PARAMETERS
-        self.oauthApiHelper.registrateApplicationParametersCliendID(CLIENT_ID,
-                                                                 clientSecret:CLIENT_SECRET,
-                                                                 redirectUri:REDIRECT_URI,
-                                                                 scope:SCOPE)
-        // subscribe self as delegate to SQAuthorizationProtocol
-        self.oauthApiHelper.authorizationDelegate = self
+        oauthApiHelper!.registerApplicationParametersCliendID(CLIENT_ID,
+                                                             clientSecret: CLIENT_SECRET,
+                                                             redirectUri: REDIRECT_URI,
+                                                             scope: SCOPE,
+                                                             delegate: self,
+                                                             viewControllerDelegate: self)
     }
     
     
@@ -69,7 +69,7 @@ class LoginViewController: UIViewController, SQAuthorizationProtocol {
     // MARK: - Actions
     func loginButtonPressed() {
         self.view.isUserInteractionEnabled = false
-        self.oauthApiHelper.authorizeUser()
+        oauthApiHelper!.authorizeUser()
     }
         
     
@@ -101,16 +101,6 @@ class LoginViewController: UIViewController, SQAuthorizationProtocol {
     
     
     
-    // MARK: - Navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.destination.isKind(of: SelectFileViewController.self) {
-            if sender != nil {
-                let destinationVC = segue.destination as! SelectFileViewController
-                destinationVC.token = sender as! SQToken?
-            }
-        }
-    }
-    
     
     
     // MARK: - Allert Message
@@ -123,10 +113,5 @@ class LoginViewController: UIViewController, SQAuthorizationProtocol {
     
     
     
-    // MARK: - Memory help
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
 
 }

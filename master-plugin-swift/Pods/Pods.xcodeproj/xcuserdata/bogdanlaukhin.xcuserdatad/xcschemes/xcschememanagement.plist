@@ -9,20 +9,10 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>sequencing-file-selector-api-swift.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>6910EE47DCA19BC3A5B0CB615BC94AF9</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>AD77BA26040856F6542B5A3E667140CD</key>
+		<key>F2D746937450AC69DEBFF6B9DD713A76</key>
 		<dict>
 			<key>primary</key>
 			<true/>

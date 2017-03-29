@@ -82,10 +82,3 @@ strip_invalid_archs() {
   fi
 }
 
-
-if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_framework "$BUILT_PRODUCTS_DIR/sequencing-file-selector-api-swift/sequencing_file_selector_api_swift.framework"
-fi
-if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_framework "$BUILT_PRODUCTS_DIR/sequencing-file-selector-api-swift/sequencing_file_selector_api_swift.framework"
-fi
