@@ -7,8 +7,16 @@ import UIKit
 import QuartzCore
 
 
+protocol UserSignOutProtocol {
+    
+    func userDidSignOut() -> Void
+}
+
+
 
 class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
+    
+    public var delegate: UserSignOutProtocol?
     
     let kMainQueue = DispatchQueue.main
     let kBackgroundQueue = DispatchQueue.global()
@@ -102,6 +110,14 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
         
         
     }
+    
+    
+    @IBAction func signOutButtonPressed(_ sender: Any) {
+        if delegate != nil {
+            delegate!.userDidSignOut()
+        }
+    }
+    
     
     
     // MARK: - SQFileSelectorProtocolDelegate
@@ -336,10 +352,7 @@ class SelectFileViewController: UIViewController, SQFileSelectorProtocol {
     
         
     
-    // MARK: - SQTokenRefreshProtocolDelegate
-    func tokenIsRefreshed(_ updatedToken: SQToken) -> Void {
-        
-    }
+    
     
     
     

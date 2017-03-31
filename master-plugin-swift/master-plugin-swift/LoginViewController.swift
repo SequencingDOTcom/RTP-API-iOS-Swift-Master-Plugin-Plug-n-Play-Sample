@@ -7,7 +7,7 @@ import Foundation
 import UIKit
 
 
-class LoginViewController: UIViewController, SQAuthorizationProtocol {
+class LoginViewController: UIViewController, SQAuthorizationProtocol, UserSignOutProtocol {
     
     // THESE ARE THE APPLICATION PARAMETERS
     // SPECIFY THEM HERE
@@ -27,34 +27,6 @@ class LoginViewController: UIViewController, SQAuthorizationProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        // set up loginButton
-        let loginButton = UIButton(type: UIButtonType.custom)
-        loginButton.setImage(UIImage(named: "button_signin_black"), for: UIControlState())
-        loginButton.addTarget(self, action: #selector(self.loginButtonPressed), for: UIControlEvents.touchUpInside)
-        loginButton.sizeToFit()
-        loginButton.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(loginButton)
-        self.view.bringSubview(toFront: loginButton)
-        
-        // adding constraints for loginButton
-        let xCenter = NSLayoutConstraint.init(item: loginButton,
-                                              attribute: NSLayoutAttribute.centerX,
-                                              relatedBy: NSLayoutRelation.equal,
-                                              toItem: self.view,
-                                              attribute: NSLayoutAttribute.centerX,
-                                              multiplier: 1,
-                                              constant: 0)
-        let yCenter = NSLayoutConstraint.init(item: loginButton,
-                                              attribute: NSLayoutAttribute.centerY,
-                                              relatedBy: NSLayoutRelation.equal,
-                                              toItem: self.view,
-                                              attribute: NSLayoutAttribute.centerY,
-                                              multiplier: 1,
-                                              constant: 0)
-        self.view.addConstraint(xCenter)
-        self.view.addConstraint(yCenter)
-        
         // REGISTER APPLICATION PARAMETERS
         oauthApiHelper!.registerApplicationParametersCliendID(CLIENT_ID,
                                                              clientSecret: CLIENT_SECRET,
@@ -65,13 +37,18 @@ class LoginViewController: UIViewController, SQAuthorizationProtocol {
     }
     
     
-    
     // MARK: - Actions
-    func loginButtonPressed() {
+    @IBAction func loginButtonPressed(_ sender: Any) {
         self.view.isUserInteractionEnabled = false
         oauthApiHelper!.authorizeUser()
     }
-        
+    
+    
+    @IBAction func registerResetPressed(_ sender: Any) {
+        oauthApiHelper!.callRegisterResetAccountFlow()
+    }
+    
+    
     
     
     // MARK: - SQAuthorizationProtocolDelegate
@@ -100,6 +77,31 @@ class LoginViewController: UIViewController, SQAuthorizationProtocol {
     }
     
     
+    func userDidSignOut() -> Void {
+        self.dismiss(animated: true, completion: nil)
+        
+        // Clear out credentials
+        let credentialStorage = URLCredentialStorage.shared
+        
+        for (protectionSpace, credentials) in credentialStorage.allCredentials {
+            for (_, credential) in credentials {
+                credentialStorage.remove(credential, for: protectionSpace)
+            }
+        }
+        
+        // Clear out cookies
+        let cookieStorage = HTTPCookieStorage.shared
+        cookieStorage.cookies?.forEach { cookieStorage.deleteCookie($0) }
+    }
+    
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let selectNav: UINavigationController = segue.destination as! UINavigationController
+        let selectFileVC: SelectFileViewController = selectNav.viewControllers.first as! SelectFileViewController
+        
+        selectFileVC.delegate = self
+    }
     
     
     
